@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue{% endblock %}
+
+{% block body %}
+<div class="container text-center mt-5">
+
+    <h1 class="mb-4">Bienvenue dans l'application</h1>
+    <p class="mb-5">Veuillez choisir une option :</p>
+
+    <a href="http://127.0.0.1:8000/login" class="btn btn-primary btn-lg w-50 mb-3">
+        Se connecter
+    </a>
+
+    <br>
+
+    <a href="http://127.0.0.1:8000/users/new" class="btn btn-success btn-lg w-50">
+        Créer un compte
+    </a>
+
+</div>
+{% endblock %}

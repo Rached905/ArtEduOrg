@@ -1,0 +1,41 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+<div class="form-group">
+    {{ form_label(form.email, 'Adresse Email') }}
+    {{ form_widget(form.email, {
+        'attr': {'placeholder': 'exemple@domaine.com'}
+    }) }}
+    {{ form_errors(form.email) }}
+</div>
+
+<div class="form-group">
+    {{ form_label(form.password, 'Mot de Passe') }}
+    {{ form_widget(form.password, {
+        'attr': {'placeholder': '••••••••'}
+    }) }}
+    {{ form_errors(form.password) }}
+</div>
+
+<div class="form-group">
+    {{ form_label(form.fullname, 'Nom Complet') }}
+    {{ form_widget(form.fullname, {
+        'attr': {'placeholder': 'Jean Dupont'}
+    }) }}
+    {{ form_errors(form.fullname) }}
+</div>
+
+<div class="form-group">
+    {{ form_label(form.role, 'Rôle') }}
+    {{ form_widget(form.role) }}
+    {{ form_errors(form.role) }}
+</div>
+
+<div class="form-check mb-3">
+        {{ form_widget(form.isActive) }}
+        {{ form_label(form.isActive) }}
+        {{ form_errors(form.isActive) }}
+</div>
+
+<button type="submit" class="btn">{{ button_label|default('Enregistrer') }}</button>
+
+{{ form_end(form) }}

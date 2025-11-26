@@ -1,0 +1,278 @@
+/* style.css - Optimisé pour les formulaires Symfony */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+#layoutAuthentication {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 80px);
+}
+
+#layoutAuthentication_content {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+main {
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Titre principal */
+h1 {
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Carte du formulaire */
+form {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.5s ease-out;
+    margin-bottom: 20px;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Groupes de champs Symfony */
+.form-group,
+form > div {
+    margin-bottom: 24px;
+}
+
+/* Labels */
+label {
+    display: block;
+    color: #4a5568;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+/* Tous les inputs et select */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #2d3748;
+    background-color: #f7fafc;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+input:focus,
+select:focus,
+.form-control:focus {
+    border-color: #667eea;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input::placeholder {
+    color: #a0aec0;
+}
+
+/* Select customisé */
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+select option {
+    padding: 10px;
+}
+
+/* Bouton principal */
+.btn,
+button[type="submit"] {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn:hover,
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn:active,
+button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* Lien retour */
+main > a,
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 20px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+main > a:hover,
+.back-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-5px);
+}
+
+main > a::before,
+.back-link::before {
+    content: "←";
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* Footer */
+#layoutAuthentication_footer {
+    margin-top: auto;
+}
+
+footer {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+footer .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+footer a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+footer a:hover {
+    opacity: 0.8;
+}
+
+/* Messages d'erreur Symfony */
+.invalid-feedback,
+.form-error-message {
+    color: #f56565;
+    font-size: 13px;
+    margin-top: 6px;
+    display: block;
+}
+
+.is-invalid {
+    border-color: #f56565 !important;
+}
+
+/* Messages de succès */
+.alert-success,
+.success-message {
+    background: #c6f6d5;
+    color: #22543d;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+    border: none;
+}
+
+/* Animation au focus des labels */
+form > div:focus-within label {
+    color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    form {
+        padding: 30px 20px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    body {
+        padding: 20px 10px;
+    }
+}
+
+/* Masquer les labels générés automatiquement si besoin */
+form > div > div:first-child {
+    /* Garde la structure Symfony */
+}
+
+/* Style pour les checkboxes et radios si présents */
+input[type="checkbox"],
+input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+/* Correction pour les formulaires Symfony imbriqués */
+form > div[id] > div {
+    display: block;
+}
+
+/* Widget Symfony - Select */
+select[id*="role"] {
+    font-weight: 500;
+}
+
+select[id*="role"] option {
+    padding: 10px;
+    font-weight: 500;
+}

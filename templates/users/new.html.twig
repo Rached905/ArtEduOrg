@@ -1,0 +1,13 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Créer un Utilisateur{% endblock %}
+
+{% block body %}
+    <h1>Créer un Utilisateur</h1>
+
+    {{ include('users/_form.html.twig', {
+        'button_label': 'Créer'
+    }) }}
+
+    <a href="{{ path('app_users_index') }}">Retour à la liste</a>
+{% endblock %}
