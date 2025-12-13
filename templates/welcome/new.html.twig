@@ -1,0 +1,634 @@
+{% extends 'base2.html.twig' %}
+
+{% set hide_navbar = true %}
+
+{% block title %}Créer un Compte{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #layoutSidenav {
+        display: block;
+        min-height: 100vh;
+    }
+
+    #layoutSidenav_content {
+        margin-left: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    main {
+        width: 100%;
+        padding: 2rem 1rem;
+    }
+
+    .welcome-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .welcome-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .welcome-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+
+    .welcome-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin-bottom: 0;
+    }
+
+    .welcome-logo {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .welcome-logo i {
+        font-size: 2.5rem;
+    }
+
+    .welcome-body {
+        padding: 3rem 2.5rem;
+    }
+
+    .signup-form-section h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        display: block;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        font-size: 1.1rem;
+        z-index: 1;
+    }
+
+    .form-control {
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .form-select {
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .password-strength {
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak { width: 33%; background: #fc8181; }
+    .strength-medium { width: 66%; background: #f6ad55; }
+    .strength-strong { width: 100%; background: #48bb78; }
+
+    .role-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .role-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+    }
+
+    .role-card:hover {
+        border-color: #667eea;
+        background: #f8f9fc;
+        transform: translateY(-2px);
+    }
+
+    .role-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .role-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .role-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .role-icon i {
+        color: white;
+        font-size: 1.8rem;
+    }
+
+    .role-card h5 {
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .role-card p {
+        color: #718096;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .form-check-wrapper {
+        padding: 1rem;
+        background: #f7fafc;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: start;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.125rem;
+        margin-right: 0.75rem;
+        cursor: pointer;
+    }
+
+    .form-check-label {
+        color: #4a5568;
+        font-size: 0.95rem;
+        cursor: pointer;
+    }
+
+    .form-check-label a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .form-check-label a:hover {
+        text-decoration: underline;
+    }
+
+    .btn-signup {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        cursor: pointer;
+    }
+
+    .btn-signup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-signup:active {
+        transform: translateY(0);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f0f0f0;
+        color: #718096;
+    }
+
+    .login-link a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        margin-left: 0.5rem;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        border-radius: 10px;
+        border: none;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .text-danger {
+        color: #e74a3b;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .welcome-header h1 {
+            font-size: 2rem;
+        }
+        
+        .welcome-body {
+            padding: 2rem 1.5rem;
+        }
+
+        .role-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="welcome-container">
+    <div class="welcome-card">
+        {# Header Section #}
+        <div class="welcome-header">
+            <div class="welcome-logo">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h1>Bienvenue !</h1>
+            <p>Créez votre compte et commencez votre aventure avec nous</p>
+        </div>
+
+        {# Body Section #}
+        <div class="welcome-body">
+            {# Flash Messages #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ label == 'success' ? 'check-circle' : 'exclamation-triangle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="signup-form-section">
+                <h3>Créez votre compte</h3>
+
+                <form method="post" action="{{ path('app_welcome_new') }}" id="signupForm" novalidate>
+                    <div class="form-group">
+                        <label for="fullname" class="form-label">   Nom Complet</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="fullname" 
+                                name="fullname" 
+                                class="form-control" 
+                                placeholder="Jean Dupont"
+                                required
+                                minlength="2"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">   Adresse Email</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-control" 
+                                placeholder="  votre.email@exemple.com"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">   Mot de Passe</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-control" 
+                                placeholder="••••••••"
+                                required
+                                minlength="8"
+                            >
+                        </div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="strengthBar"></div>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Minimum 8 caractères avec majuscule, minuscule et chiffre
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Choisissez votre profil</label>
+                        <div class="role-cards">
+                            <label class="role-card" for="role_user">
+                                <input 
+                                    type="radio" 
+                                    id="role_user" 
+                                    name="role" 
+                                    value="USER" 
+                                    required
+                                >
+                                <div class="role-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <h5>🟢 Vendeur</h5>
+                                <p>Je veux vendre mes produits</p>
+                            </label>
+
+                            <label class="role-card" for="role_agent">
+                                <input 
+                                    type="radio" 
+                                    id="role_agent" 
+                                    name="role" 
+                                    value="AGENT"
+                                    required
+                                >
+                                <div class="role-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                </div>
+                                <h5>🔵 Client</h5>
+                                <p>Je veux acheter des produits</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-check-wrapper">
+                        <div class="form-check">
+                            <input 
+                                type="checkbox" 
+                                id="acceptTerms" 
+                                name="acceptTerms" 
+                                class="form-check-input"
+                                required
+                            >
+                            <label for="acceptTerms" class="form-check-label">
+                                J'accepte les <a href="#">Conditions d'Utilisation</a> et la <a href="#">Politique de Confidentialité</a>
+                            </label>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('signup') }}">
+
+                    <button type="submit" class="btn btn-signup">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Créer mon compte
+                    </button>
+                </form>
+
+                <div class="login-link">
+                    Vous avez déjà un compte ?
+                    <a href="{{ path('app_login') }}">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Se connecter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Role card selection
+        const roleCards = document.querySelectorAll('.role-card');
+        const roleInputs = document.querySelectorAll('input[name="role"]');
+
+        roleCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                roleCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Check the radio button
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                }
+            });
+        });
+
+        // Pre-select if already checked
+        roleInputs.forEach(input => {
+            if (input.checked) {
+                input.closest('.role-card').classList.add('selected');
+            }
+        });
+
+        // Password strength indicator
+        const passwordField = document.getElementById('password');
+        const strengthBar = document.getElementById('strengthBar');
+
+        if (passwordField && strengthBar) {
+            passwordField.addEventListener('input', function() {
+                const password = this.value;
+                const strength = calculatePasswordStrength(password);
+                updateStrengthBar(strength);
+            });
+        }
+
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+            
+            if (strength <= 2) return 'weak';
+            if (strength <= 4) return 'medium';
+            return 'strong';
+        }
+
+        function updateStrengthBar(strength) {
+            strengthBar.className = 'password-strength-bar';
+            if (strength === 'weak') {
+                strengthBar.classList.add('strength-weak');
+            } else if (strength === 'medium') {
+                strengthBar.classList.add('strength-medium');
+            } else if (strength === 'strong') {
+                strengthBar.classList.add('strength-strong');
+            }
+        }
+
+        // Form validation
+        const signupForm = document.getElementById('signupForm');
+        if (signupForm) {
+            signupForm.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                // Validation du nom complet
+                const fullname = document.getElementById('fullname');
+                if (fullname.value.trim().length < 2) {
+                    isValid = false;
+                    fullname.style.borderColor = '#e74a3b';
+                }
+
+                // Validation de l'email
+                const email = document.getElementById('email');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email.value)) {
+                    isValid = false;
+                    email.style.borderColor = '#e74a3b';
+                }
+
+                // Validation du mot de passe
+                const password = document.getElementById('password');
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+                if (!passwordRegex.test(password.value)) {
+                    isValid = false;
+                    password.style.borderColor = '#e74a3b';
+                    alert('Le mot de passe doit contenir au moins 8 caractères avec une majuscule, une minuscule et un chiffre.');
+                }
+
+                // Validation du rôle
+                const roleSelected = document.querySelector('input[name="role"]:checked');
+                if (!roleSelected) {
+                    isValid = false;
+                    alert('Veuillez choisir un profil (Vendeur ou Client).');
+                }
+
+                // Validation des conditions
+                const acceptTerms = document.getElementById('acceptTerms');
+                if (!acceptTerms.checked) {
+                    isValid = false;
+                    alert('Vous devez accepter les conditions d\'utilisation.');
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Remove error styling on input
+            const inputs = signupForm.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.style.borderColor = '#e2e8f0';
+                });
+            });
+        }
+    </script>
+{% endblock %}

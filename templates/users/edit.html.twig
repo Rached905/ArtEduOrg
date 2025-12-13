@@ -1,13 +1,609 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Users{% endblock %}
+{% block title %}Modifier l'Utilisateur{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-header h1 {
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 0;
+    }
+
+    .breadcrumb-item {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .breadcrumb-item a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .breadcrumb-item.active {
+        color: white;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .edit-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .edit-card .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 2px solid #e9ecef;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .form-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-section-title {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label i {
+        color: #667eea;
+    }
+
+    .required-indicator {
+        color: #dc3545;
+        font-weight: 700;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+    }
+
+    .input-group-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px 0 0 8px;
+    }
+
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary-custom:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #6a3e8f 100%);
+    }
+
+    .danger-zone {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        border: 2px solid #dc3545;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .danger-zone h5 {
+        color: #dc3545;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .info-alert {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-left: 4px solid #3b82f6;
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .password-strength {
+        height: 8px;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+    }
+
+    .password-strength-weak {
+        width: 33%;
+        background: linear-gradient(90deg, #dc3545, #c82333);
+    }
+
+    .password-strength-medium {
+        width: 66%;
+        background: linear-gradient(90deg, #ffc107, #ff9800);
+    }
+
+    .password-strength-strong {
+        width: 100%;
+        background: linear-gradient(90deg, #198754, #20c997);
+    }
+
+    .toggle-password {
+        cursor: pointer;
+        color: #6c757d;
+        transition: color 0.2s;
+    }
+
+    .toggle-password:hover {
+        color: #667eea;
+    }
+
+    .action-buttons-container {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-top: 2rem;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .edit-card {
+        animation: slideIn 0.5s ease;
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Users</h1>
+<div class="container-fluid px-4">
+    <!-- Page Header -->
+    <div class="page-header mt-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1>
+                    <i class="fas fa-user-edit me-2"></i>
+                    Modifier l'Utilisateur
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{ path('app_dashboard') }}">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ path('app_users_index') }}">
+                                <i class="fas fa-users"></i> Utilisateurs
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">Modifier</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <a href="{{ path('app_users_index') }}" class="btn btn-light btn-action">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Retour à la Liste
+                </a>
+            </div>
+        </div>
+    </div>
 
-    {{ include('users/_form.html.twig', {'button_label': 'Update'}) }}
+    <!-- Main Content -->
+    <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-12">
+            <!-- Info Alert -->
+            <div class="info-alert">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="fas fa-info-circle fs-4"></i>
+                    <div>
+                        <strong>Information importante :</strong>
+                        <p class="mb-0 mt-1">
+                            Vous modifiez les informations de <strong>{{ user.fullname }}</strong> ({{ user.email }}).
+                            Les champs marqués d'un <span class="required-indicator">*</span> sont obligatoires.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    <a href="{{ path('app_users_index') }}">back to list</a>
+            <!-- Edit Form Card -->
+            <div class="card edit-card">
+                <div class="card-header">
+                    <i class="fas fa-edit me-2"></i>
+                    Formulaire de Modification
+                </div>
+                <div class="card-body p-4">
+                    {{ form_start(form, {'attr': {'class': 'user-edit-form', 'novalidate': 'novalidate'}}) }}
+                    
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h5 class="form-section-title">
+                            <i class="fas fa-user me-2"></i>
+                            Informations Personnelles
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.fullname, null, {
+                                        'label_attr': {'class': 'form-label'},
+                                        'label': 'Nom Complet'
+                                    }) }}
+                                    <span class="required-indicator">*</span>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                        {{ form_widget(form.fullname, {
+                                            'attr': {'class': 'form-control', 'placeholder': 'Jean Dupont'}
+                                        }) }}
+                                    </div>
+                                    {{ form_errors(form.fullname) }}
+                                    <small class="form-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Le nom complet de l'utilisateur
+                                    </small>
+                                </div>
+                            </div>
 
-    {{ include('users/_delete_form.html.twig') }}
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.email, null, {
+                                        'label_attr': {'class': 'form-label'},
+                                        'label': 'Adresse Email'
+                                    }) }}
+                                    <span class="required-indicator">*</span>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-envelope"></i>
+                                        </span>
+                                        {{ form_widget(form.email, {
+                                            'attr': {'class': 'form-control', 'placeholder': 'jean.dupont@example.com'}
+                                        }) }}
+                                    </div>
+                                    {{ form_errors(form.email) }}
+                                    <small class="form-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Utilisée pour la connexion et les notifications
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Section -->
+                    <div class="form-section">
+                        <h5 class="form-section-title">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Sécurité et Accès
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.password, null, {
+                                        'label_attr': {'class': 'form-label'},
+                                        'label': 'Nouveau Mot de Passe'
+                                    }) }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-lock"></i>
+                                        </span>
+                                        {{ form_widget(form.password, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'placeholder': 'Laisser vide pour ne pas changer',
+                                                'id': 'passwordField'
+                                            }
+                                        }) }}
+                                        <span class="input-group-text toggle-password" onclick="togglePassword()">
+                                            <i class="fas fa-eye" id="toggleIcon"></i>
+                                        </span>
+                                    </div>
+                                    {{ form_errors(form.password) }}
+                                    <div class="password-strength" id="passwordStrength" style="display: none;">
+                                        <div class="password-strength-bar" id="strengthBar"></div>
+                                    </div>
+                                    <small class="form-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Minimum 8 caractères. Laissez vide pour conserver le mot de passe actuel.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form_label(form.role, null, {
+                                        'label_attr': {'class': 'form-label'},
+                                        'label': 'Rôle de l\'Utilisateur'
+                                    }) }}
+                                    <span class="required-indicator">*</span>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-user-tag"></i>
+                                        </span>
+                                        {{ form_widget(form.role, {
+                                            'attr': {'class': 'form-select'}
+                                        }) }}
+                                    </div>
+                                    {{ form_errors(form.role) }}
+                                    <small class="form-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Définit les permissions de l'utilisateur
+                                    </small>
+                                </div>
+                            </div>
+                            {# In your Security Section, add after the role field: #}
+<div class="col-md-12">
+    <div class="mb-3">
+        <div class="form-check form-switch">
+            {{ form_widget(form.isActive, {
+                'attr': {'class': 'form-check-input', 'role': 'switch'}
+            }) }}
+            {{ form_label(form.isActive, null, {
+                'label_attr': {'class': 'form-check-label'}
+            }) }}
+        </div>
+        {{ form_errors(form.isActive) }}
+        <small class="form-text">
+            <i class="fas fa-info-circle"></i>
+            Décochez pour désactiver temporairement le compte utilisateur
+        </small>
+    </div>
+</div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons-container">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary-custom btn-action w-100">
+                                    <i class="fas fa-save me-2"></i>
+                                    Enregistrer les Modifications
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{{ path('app_users_show', {'id': user.id}) }}" 
+                                   class="btn btn-secondary btn-action w-100">
+                                    <i class="fas fa-times me-2"></i>
+                                    Annuler
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="danger-zone">
+                <h5>
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Zone Dangereuse
+                </h5>
+                <p class="mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Les actions suivantes sont <strong>irréversibles</strong>. Procédez avec prudence.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ path('app_users_show', {'id': user.id}) }}" class="btn btn-warning btn-action">
+                        <i class="fas fa-eye me-2"></i>
+                        Voir les Détails
+                    </a>
+                    {{ include('users/_delete_form.html.twig', {
+                        'button_class': 'btn btn-danger btn-action',
+                        'button_icon': 'fas fa-trash-alt',
+                        'button_text': 'Supprimer l\'Utilisateur'
+                    }) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.user-edit-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    }
+
+    // Password strength indicator
+    const passwordField = document.getElementById('passwordField');
+    const strengthIndicator = document.getElementById('passwordStrength');
+    const strengthBar = document.getElementById('strengthBar');
+
+    if (passwordField) {
+        passwordField.addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password.length === 0) {
+                strengthIndicator.style.display = 'none';
+                return;
+            }
+            
+            strengthIndicator.style.display = 'block';
+            const strength = calculatePasswordStrength(password);
+            updateStrengthBar(strength);
+        });
+    }
+
+    function calculatePasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]+/)) strength++;
+        if (password.match(/[A-Z]+/)) strength++;
+        if (password.match(/[0-9]+/)) strength++;
+        if (password.match(/[$@#&!]+/)) strength++;
+        
+        return strength;
+    }
+
+    function updateStrengthBar(strength) {
+        strengthBar.className = 'password-strength-bar';
+        
+        if (strength <= 2) {
+            strengthBar.classList.add('password-strength-weak');
+        } else if (strength <= 4) {
+            strengthBar.classList.add('password-strength-medium');
+        } else {
+            strengthBar.classList.add('password-strength-strong');
+        }
+    }
+
+    // Confirmation before leaving with unsaved changes
+    let formChanged = false;
+    const formInputs = form.querySelectorAll('input, select, textarea');
+    
+    formInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            formChanged = true;
+        });
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    form.addEventListener('submit', () => {
+        formChanged = false;
+    });
+});
+
+function togglePassword() {
+    const passwordField = document.getElementById('passwordField');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+// Auto-save draft (optional feature)
+function saveDraft() {
+    const formData = new FormData(document.querySelector('.user-edit-form'));
+    const draft = Object.fromEntries(formData);
+    
+    localStorage.setItem('user_edit_draft_{{ user.id }}', JSON.stringify(draft));
+    
+    showToast('Brouillon sauvegardé automatiquement', 'info');
+}
+
+// Auto-save every 30 seconds
+setInterval(saveDraft, 30000);
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} position-fixed bottom-0 end-0 m-3`;
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+        ${message}
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s';
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+</script>
+
+<!-- SweetAlert2 for confirmations -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}

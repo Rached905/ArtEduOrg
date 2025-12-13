@@ -1,10 +1,551 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard Administrateur{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .stats-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        color: white;
+        height: 100%;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-card.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .stats-card.success { background: linear-gradient(135deg, #0cebeb 0%, #20e3b2 100%); }
+    .stats-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stats-card.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+    .stats-icon {
+        font-size: 3rem;
+        opacity: 0.3;
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .quick-action-card {
+        border: none;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        color: white;
+    }
+
+    .quick-action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        color: white;
+    }
+
+    .quick-action-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+    .card-modern {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-modern .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 2px solid #e9ecef;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: start;
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+
+    .activity-item:hover { background: #f8f9fa; }
+    .activity-item:last-child { border-bottom: none; }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .activity-icon.success { background: rgba(25, 135, 84, 0.1); color: #198754; }
+    .activity-icon.info { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
+    .activity-icon.warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+    .activity-icon.danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .role-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: white;
+    }
+
+    .role-badge.admin { background-color: #dc3545; }
+    .role-badge.client { background-color: #0d6efd; }
+    .role-badge.vendor { background-color: #198754; }
+
+    .progress-section {
+        margin-top: 1.5rem;
+    }
+
+    .progress-item {
+        margin-bottom: 1rem;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        background: #e9ecef;
+    }
+
+    .progress-bar {
+        border-radius: 4px;
+        transition: width 0.6s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeInUp 0.5s ease;
+    }
+</style>
+{% endblock %}
 
 {% block body %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Dashboard</h1>
-    <p>Bienvenue dans votre tableau de bord Symfony + SB Admin.</p>
+    <!-- Header -->
+    <div class="dashboard-header mt-4 animate-fade-in">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1><i class="fas fa-tachometer-alt me-2"></i>Tableau de Bord</h1>
+                <p class="mb-0">Bienvenue, <strong>{{ app.user.fullname }}</strong> ! Voici un aperçu de votre système.</p>
+            </div>
+            <span class="badge bg-light text-dark px-3 py-2">
+                <i class="far fa-calendar-alt me-2"></i>{{ "now"|date("d/m/Y") }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card primary animate-fade-in" style="animation-delay: 0.1s">
+                <div class="card-body position-relative">
+                    <div class="stats-icon"><i class="fas fa-users"></i></div>
+                    <div class="stats-number">{{ stats.total_users }}</div>
+                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Total Utilisateurs</div>
+                    <small>
+                        <i class="fas fa-arrow-{{ stats.growth_percentage >= 0 ? 'up' : 'down' }} me-1"></i>
+                        {{ stats.growth_percentage|abs }}% ce mois
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card success animate-fade-in" style="animation-delay: 0.2s">
+                <div class="card-body position-relative">
+                    <div class="stats-icon"><i class="fas fa-user-check"></i></div>
+                    <div class="stats-number">{{ stats.active_users }}</div>
+                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Comptes Actifs</div>
+                    <small>
+                        <i class="fas fa-check-circle me-1"></i>
+                        {{ (stats.active_users / stats.total_users * 100)|round }}% du total
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card warning animate-fade-in" style="animation-delay: 0.3s">
+                <div class="card-body position-relative">
+                    <div class="stats-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stats-number">{{ stats.inactive_users }}</div>
+                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Comptes Inactifs</div>
+                    <small>
+                        <i class="fas fa-times-circle me-1"></i>
+                        {{ (stats.inactive_users / stats.total_users * 100)|round }}% du total
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card info animate-fade-in" style="animation-delay: 0.4s">
+                <div class="card-body position-relative">
+                    <div class="stats-icon"><i class="fas fa-user-plus"></i></div>
+                    <div class="stats-number">{{ stats.new_users_this_month }}</div>
+                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Nouveaux ce mois</div>
+                    <small>
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        Depuis le {{ "first day of this month"|date("d/m/Y") }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-12"><h4><i class="fas fa-bolt me-2"></i>Actions Rapides</h4></div>
+        <div class="col-xl-3 col-md-6">
+            <a href="{{ path('app_users_new') }}" class="quick-action-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-center">
+                    <div class="quick-action-icon"><i class="fas fa-user-plus"></i></div>
+                    <h5 class="mb-0">Ajouter Utilisateur</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="{{ path('app_users_index') }}" class="quick-action-card" style="background: linear-gradient(135deg, #0cebeb 0%, #20e3b2 100%);">
+                <div class="card-body text-center">
+                    <div class="quick-action-icon"><i class="fas fa-users"></i></div>
+                    <h5 class="mb-0">Gérer Utilisateurs</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="{{ path('app_users_index') }}" class="quick-action-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body text-center">
+                    <div class="quick-action-icon"><i class="fas fa-chart-bar"></i></div>
+                    <h5 class="mb-0">Rapports</h5>
+                </div>
+            </a>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <a href="{{ path('app_dashboard') }}" class="quick-action-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body text-center">
+                    <div class="quick-action-icon"><i class="fas fa-cog"></i></div>
+                    <h5 class="mb-0">Paramètres</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Charts & Activity -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-8">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-chart-line me-2"></i>Inscriptions des 7 derniers jours
+                </div>
+                <div class="card-body">
+                    <canvas id="userGrowthChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="card card-modern">
+                <div class="card-header"><i class="fas fa-history me-2"></i>Activité Récente</div>
+                <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                    {% if recent_activities is not empty %}
+                        {% for activity in recent_activities %}
+                            <div class="activity-item">
+                                <div class="activity-icon {{ activity.class }}">
+                                    <i class="fas fa-{{ activity.icon }}"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ activity.title }}</div>
+                                    <small class="text-muted">{{ activity.description }}</small>
+                                    <div><small class="text-muted"><i class="far fa-clock me-1"></i>{{ activity.time }}</small></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p class="mb-0">Aucune activité récente</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Distribution & Recent Users -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-2"></i>Répartition par Rôle
+                </div>
+                <div class="card-body">
+                    <canvas id="roleDistributionChart" height="200"></canvas>
+                    
+                    <div class="progress-section">
+                        {% set total = stats.total_users %}
+                        
+                        <div class="progress-item">
+                            <div class="progress-label">
+                                <span><i class="fas fa-circle text-danger me-2"></i>Administrateurs</span>
+                                <strong>{{ stats.admin_count }} ({{ (stats.admin_count / total * 100)|round }}%)</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" style="width: {{ (stats.admin_count / total * 100) }}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-label">
+                                <span><i class="fas fa-circle text-success me-2"></i>Vendeurs</span>
+                                <strong>{{ stats.vendor_count }} ({{ (stats.vendor_count / total * 100)|round }}%)</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: {{ (stats.vendor_count / total * 100) }}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-label">
+                                <span><i class="fas fa-circle text-primary me-2"></i>Clients</span>
+                                <strong>{{ stats.client_count }} ({{ (stats.client_count / total * 100)|round }}%)</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: {{ (stats.client_count / total * 100) }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8">
+            <div class="card card-modern">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div><i class="fas fa-users me-2"></i>Utilisateurs Récents</div>
+                    <a href="{{ path('app_users_index') }}" class="btn btn-sm btn-primary">
+                        Voir Tous <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Email</th>
+                                    <th>Rôle</th>
+                                    <th>Statut</th>
+                                    <th>Date</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_users is not empty %}
+                                    {% for user in recent_users %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="user-avatar">
+                                                        {{ user.fullname|slice(0, 1)|upper }}{{ user.fullname|split(' ')[1]|default('')|slice(0, 1)|upper }}
+                                                    </div>
+                                                    <strong>{{ user.fullname }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>{{ user.email }}</td>
+                                            <td>
+                                                {% if user.role.value == 'ADMIN' %}
+                                                    <span class="role-badge admin"><i class="fas fa-user-shield me-1"></i>Admin</span>
+                                                {% elseif user.role.value == 'VENDEUR' %}
+                                                    <span class="role-badge vendor"><i class="fas fa-store me-1"></i>Vendeur</span>
+                                                {% elseif user.role.value == 'CLIENT' %}
+                                                    <span class="role-badge client"><i class="fas fa-user me-1"></i>Client</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if user.isActive %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Actif
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-times-circle me-1"></i>Inactif
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <i class="far fa-calendar me-1"></i>
+                                                    {{ user.createdAt ? user.createdAt|date("d/m/Y") : 'N/A' }}
+                                                </small>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{ path('app_users_show', {'id': user.id}) }}" class="btn btn-sm btn-info me-1" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ path('app_users_edit', {'id': user.id}) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                            Aucun utilisateur trouvé
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // User Growth Chart - Données réelles depuis le contrôleur
+    const userGrowthCtx = document.getElementById('userGrowthChart');
+    const chartLabels = {{ chart_data.labels|json_encode|raw }};
+    const chartData = {{ chart_data.data|json_encode|raw }};
+    
+    new Chart(userGrowthCtx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Nouveaux Utilisateurs',
+                data: chartData,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 }
+                }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+    
+    // Role Distribution Chart - Données réelles
+    const roleCtx = document.getElementById('roleDistributionChart');
+    new Chart(roleCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Administrateurs', 'Vendeurs', 'Clients'],
+            datasets: [{
+                data: [
+                    {{ stats.admin_count }},
+                    {{ stats.vendor_count }},
+                    {{ stats.client_count }}
+                ],
+                backgroundColor: [
+                    '#dc3545',
+                    '#198754',
+                    '#0d6efd'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/users')]
 final class UsersController extends AbstractController
 {
-    #[Route(name: 'app_users_index', methods: ['GET'])]
+    #[Route('/', name: 'app_users_index', methods: ['GET'])]
     public function index(UsersRepository $usersRepository): Response
     {
         return $this->render('users/index.html.twig', [
@@ -33,7 +33,7 @@ final class UsersController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_users_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_users_new', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('users/new.html.twig', [

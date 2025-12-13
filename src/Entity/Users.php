@@ -7,8 +7,14 @@ use App\Repository\UsersRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cette adresse email est déjà utilisée.'
+)]
 class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -17,28 +23,64 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank(message: "L'email est obligatoire")]
+    #[Assert\Email(
+        message: "L'adresse email '{{ value }}' n'est pas valide."
+    )]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "L'email ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire")]
+    #[Assert\Length(
+        min: 8,
+        max: 255,
+        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le mot de passe ne peut pas dépasser {{ limit }} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/',
+        message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'
+    )]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom complet est obligatoire")]
+    #[Assert\Length(
+        min: 4,
+        max: 255,
+        minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-ZÀ-ÿ\s\-\']+$/u',
+        message: 'Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes'
+    )]
     private ?string $fullname = null;
 
     #[ORM\Column(enumType: Role::class)]
+    #[Assert\NotNull(message: "Le rôle est obligatoire")]
     private ?Role $role = null;
 
     #[ORM\Column(options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "Le statut actif doit être défini")]
+    #[Assert\Type(
+        type: 'bool',
+        message: 'La valeur {{ value }} n\'est pas un booléen valide.'
+    )]
     private ?bool $isActive = null;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->isActive = true; // Par défaut, le compte est actif
     }
-
 
     public function getId(): ?int
     {
@@ -52,7 +94,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = $email;
+        $this->email = strtolower(trim($email)); // Normalisation
         return $this;
     }
 
@@ -74,7 +116,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setFullname(string $fullname): static
     {
-        $this->fullname = $fullname;
+        $this->fullname = trim($fullname); // Suppression espaces inutiles
         return $this;
     }
 
@@ -111,13 +153,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        // Symfony exige un tableau de string
         return [$this->role->value];
     }
 
     public function eraseCredentials(): void
     {
-        // Si tu stockes des données sensibles temporairement, nettoie-les ici
+        // Nettoyer les données sensibles temporaires si nécessaire
     }
 
     public function isActive(): ?bool
@@ -128,7 +169,10 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
-
         return $this;
     }
+    public function getIsActive(): ?bool
+{
+    return $this->isActive;
+}
 }

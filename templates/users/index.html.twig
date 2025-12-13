@@ -596,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Confirmation améliorée pour la suppression
     document.querySelectorAll('form[onsubmit*="confirm"]').forEach(form => {
         form.onsubmit = function(e) {
-            e.preventDefault();
+            
             const userName = this.getAttribute('action').match(/delete\/(\d+)/);
             
             Swal.fire({

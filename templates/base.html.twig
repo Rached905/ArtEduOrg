@@ -13,18 +13,9 @@
 
     {% block stylesheets %}{% endblock %}
 
-    <style>
-        /* Modern sidebar styles */
-        .modern-sidenav {
-            width: 250px;
-            transition: transform 0.3s ease;
-        }
-        body.sb-sidenav-toggled #layoutSidenav_nav {
-            transform: translateX(-250px);
-        }
-    </style>
+    
 </head>
-<body class="sb-nav-fixed">
+<body >
 
     {% if hide_navbar is not defined or hide_navbar == false %}
         {% include 'partials/_navbar.html.twig' %}
@@ -47,16 +38,7 @@
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
     <script src="{{ asset('js/datatables-simple-demo.js') }}"></script>
 
-    <script>
-        // Toggle sidebar
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.body.classList.toggle('sb-sidenav-toggled');
-            });
-        }
-    </script>
+    
 
     {% block javascripts %}{% endblock %}
 </body>

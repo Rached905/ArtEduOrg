@@ -1,45 +1,281 @@
-<nav class="sb-sidenav accordion sb-sidenav-dark modern-sidenav" id="layoutSidenav_nav">
-    <div class="sb-sidenav-menu">
-        <div class="nav">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Sidebar Navigation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            <div class="sb-sidenav-menu-heading">Core</div>
-            <a class="nav-link" href="{{ path('app_dashboard') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
-                Accueil
-            </a>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+        }
 
-            <div class="sb-sidenav-menu-heading">Management</div>
+        .sb-sidenav {
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1f36 0%, #0f1419 100%);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
 
-            <a class="nav-link" href="{{ path('app_users_index') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
-                Users
-            </a>
+        .sb-sidenav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
 
-            <a class="nav-link" href="{{ path('app_users_index') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-calendar"></i></div>
-                Evenement
-            </a>
+        .sb-sidenav-menu {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1.5rem 0;
+        }
 
-            <a class="nav-link" href="{{ path('app_users_index') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
-                Vente
-            </a>
+        .sb-sidenav-menu::-webkit-scrollbar {
+            width: 6px;
+        }
 
-            <a class="nav-link" href="{{ path('app_users_index') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-handshake"></i></div>
-                Sponsoring
-            </a>
+        .sb-sidenav-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-            <a class="nav-link" href="{{ path('app_users_index') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-exclamation-circle"></i></div>
-                Reclamation
-            </a>
+        .sb-sidenav-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
 
+        .sb-sidenav-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .sb-sidenav-menu-heading {
+            color: #8b92a7;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 1.5rem 1.5rem 0.75rem;
+            position: relative;
+        }
+
+        .sb-sidenav-menu-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 1.5rem;
+            right: 1.5rem;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(139, 146, 167, 0.3) 0%, transparent 100%);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #b8bfd4;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            margin: 0 0.75rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 0 2px 2px 0;
+            transition: height 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.12);
+            color: #ffffff;
+            transform: translateX(4px);
+        }
+
+        .nav-link:hover::before {
+            height: 70%;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .nav-link.active::before {
+            height: 70%;
+        }
+
+        .sb-nav-link-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sb-nav-link-icon i {
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover .sb-nav-link-icon {
+            background: rgba(99, 102, 241, 0.2);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .nav-link.active .sb-nav-link-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .sb-sidenav-footer {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .sb-sidenav-footer .small {
+            color: #8b92a7;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .user-name {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-name::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            margin-left: auto;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <nav class="sb-sidenav accordion sb-sidenav-dark modern-sidenav" id="layoutSidenav_nav">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Core</div>
+                <a class="nav-link active" href="{{ path('app_dashboard') }}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
+                    Accueil
+                </a>
+
+                <div class="sb-sidenav-menu-heading">Management</div>
+                
+                <a class="nav-link" href="{{ path('app_users_index') }}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                    Utilisateurs
+                </a>
+
+
+                <a class="nav-link" href="#">
+                    <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
+                    Événements
+                </a>
+
+                <a class="nav-link" href="#">
+                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                    Ventes
+                </a>
+
+                <a class="nav-link" href="#">
+                    <div class="sb-nav-link-icon"><i class="fas fa-handshake"></i></div>
+                    Sponsoring
+                </a>
+
+                <a class="nav-link" href="#">
+                    <div class="sb-nav-link-icon"><i class="fas fa-exclamation-circle"></i></div>
+                    Réclamations
+                    <span class="badge">0</span>
+                </a>
+            </div>
         </div>
-    </div>
 
-    <div class="sb-sidenav-footer modern-footer">
-        <div class="small">Logged in as:</div>
-        <span class="user-name">Admin</span>
-    </div>
-</nav>
+        <div class="sb-sidenav-footer modern-footer">
+            <div class="small">Connecté en tant que:</div>
+            <span class="user-name">Admin</span>
+        </div>
+    </nav>
+
+    <script>
+        // Active link handling
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

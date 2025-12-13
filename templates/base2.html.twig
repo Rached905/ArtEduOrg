@@ -1,45 +1,326 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-    <title>{% block title %}SB Admin{% endblock %}</title>
-
-    <link rel="stylesheet" href="{{ asset('css/form.css') }}">
+    
+    <title>{% block title %}Dashboard{% endblock %} - Mon Application</title>
+    
+    <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-
+    
     {% block stylesheets %}{% endblock %}
-</head>
+    
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --danger-color: #e74a3b;
+            --warning-color: #f6c23e;
+            --info-color: #36b9cc;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
+        }
 
-<body class="bg-primary">
-    <div id="layoutAuthentication">
-        <div id="layoutAuthentication_content">
+        /* Modern Layout */
+        body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fc;
+        }
+
+        #layoutSidenav {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        #layoutSidenav_nav {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+            transition: all 0.3s ease;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .sb-sidenav {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .sb-sidenav-menu {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .sb-sidenav-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sb-sidenav-menu::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-link.active {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left-color: #fff;
+        }
+
+        .nav-link .sb-nav-link-icon {
+            margin-right: 0.75rem;
+            font-size: 1rem;
+        }
+
+        /* Content Area */
+        #layoutSidenav_content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+
+        main {
+            padding: 2rem;
+            min-height: calc(100vh - 56px - 60px);
+        }
+
+        /* Sidebar Toggle */
+        body.sb-sidenav-toggled #layoutSidenav_nav {
+            transform: translateX(calc(-1 * var(--sidebar-width)));
+        }
+
+        body.sb-sidenav-toggled #layoutSidenav_content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #5a5c69;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2653d4;
+            transform: translateY(-1px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        /* Alert Styles */
+        .alert {
+            border: none;
+            border-radius: 0.35rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .page-header h1 {
+            color: #5a5c69;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #layoutSidenav_nav {
+                transform: translateX(calc(-1 * var(--sidebar-width)));
+            }
+
+            #layoutSidenav_content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            body.sb-sidenav-toggled #layoutSidenav_nav {
+                transform: translateX(0);
+            }
+
+            main {
+                padding: 1rem;
+            }
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        .flash-message {
+            animation: slideInRight 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body >
+    
+    {% if hide_navbar is not defined or hide_navbar == false %}
+        {% include 'partials/_navbar.html.twig' %}
+        <div id="layoutSidenav">
+            {% include 'partials/_sidebar.html.twig' %}
+    {% else %}
+        <div id="layoutSidenav">
+    {% endif %}
+        
+        <div id="layoutSidenav_content">
             <main>
+                {# Flash Messages #}
+                {% for label, messages in app.flashes %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dismissible fade show flash-message" role="alert">
+                                <i class="fas fa-{% if label == 'success' %}check-circle{% elseif label == 'danger' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                
                 {% block body %}{% endblock %}
             </main>
-        </div>
-
-        <div id="layoutAuthentication_footer">
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            {% include 'partials/_footer.html.twig' %}
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('js/scripts.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
+    <script src="{{ asset('js/datatables-simple-demo.js') }}"></script>
+    
+    <script>
+        // Toggle sidebar
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.body.classList.toggle('sb-sidenav-toggled');
+                localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+            });
+        }
 
+        // Restore sidebar state
+        if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
+            document.body.classList.add('sb-sidenav-toggled');
+        }
+
+        // Auto-dismiss flash messages
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.flash-message');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+    
     {% block javascripts %}{% endblock %}
 </body>
 </html>

@@ -2,7 +2,7 @@ security:
     # Password hashing
     password_hashers:
         App\Entity\Users:
-            algorithm: plaintext
+            algorithm: plaintext  # ⚠️ À changer en production pour 'auto'
 
     # User provider (base de données)
     providers:
@@ -20,23 +20,29 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker  # ← ✅ Ajouter cette ligne
             custom_authenticator: App\Security\AppCustomAuthenticator
+            
             logout:
                 path: app_logout
-                target: /welcome   # ← redirection après logout
+                target: /welcome
 
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
-                # always_remember_me: true   # optionnel
+                # always_remember_me: true
 
     # Access control
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/welcome, roles: PUBLIC_ACCESS }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        # Protéger toutes les autres pages
+        # - { path: ^/, roles: ROLE_USER }
 
-# Configuration spécifique pour l'environnement test (optionnel)
+# Configuration spécifique pour l'environnement test
 when@test:
     security:
         password_hashers:

@@ -1,59 +1,776 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-    <title>{% block title %}Dashboard{% endblock %}</title>
-
-    <link href="{{ asset('css/styles.css') }}" rel="stylesheet" />
+    
+    <title>{% block title %}ArtMarket - Plateforme d'Art{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-
-    {% block stylesheets %}{% endblock %}
-
+    
+    {% block stylesheets %}
     <style>
-        /* Modern sidebar styles */
-        .modern-sidenav {
-            width: 250px;
-            transition: transform 0.3s ease;
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #e94560;
+            --gold-color: #d4af37;
+            --light-bg: #f5f5f5;
+            --sidebar-width: 280px;
         }
-        body.sb-sidenav-toggled #layoutSidenav_nav {
-            transform: translateX(-250px);
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            min-height: 100vh;
+        }
+
+        /* ========== MODERN NAVBAR ========== */
+        .modern-navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            padding: 0.75rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1030;
+            border-bottom: 1px solid rgba(233, 69, 96, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .modern-navbar.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            padding: 0.5rem 0;
+        }
+
+        /* Logo Section */
+        .navbar-brand-modern {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #d63850 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand-modern:hover {
+            transform: translateY(-2px);
+        }
+
+        .brand-icon-modern {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #d63850 100%);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-icon-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .brand-icon-modern:hover::before {
+            left: 100%;
+        }
+
+        .brand-icon-modern i {
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        /* Toggle Button */
+        .btn-toggle-modern {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.1rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(26, 26, 46, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-toggle-modern::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-toggle-modern:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-toggle-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 26, 46, 0.3);
+        }
+
+        /* Search Bar */
+        .navbar-search {
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .navbar-search input {
+            width: 100%;
+            padding: 0.7rem 3rem 0.7rem 1.2rem;
+            border: 2px solid rgba(233, 69, 96, 0.2);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .navbar-search input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.1);
+            background: white;
+        }
+
+        .navbar-search .search-icon {
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            pointer-events: none;
+        }
+
+        /* Navigation Links */
+        .nav-link-modern {
+            color: var(--primary-color) !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            margin: 0 0.25rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link-modern::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-color), #d63850);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link-modern:hover {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0.05) 100%);
+            color: var(--accent-color) !important;
+            transform: translateY(-2px);
+        }
+
+        .nav-link-modern:hover::before {
+            width: 80%;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* User Profile Button */
+        .user-btn-modern {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(26, 26, 46, 0.2);
+            cursor: pointer;
+        }
+
+        .user-btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 26, 46, 0.3);
+        }
+
+        .user-avatar-mini {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 2px solid white;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu-modern {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            background: white;
+            backdrop-filter: blur(20px);
+        }
+
+        .dropdown-item-modern {
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .dropdown-item-modern:hover {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0.05) 100%);
+            color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        .dropdown-item-modern i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-divider {
+            border-color: rgba(0, 0, 0, 0.08);
+            margin: 0.5rem 0;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .art-sidebar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 80px);
+            background: white;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+            padding: 2rem 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1020;
+        }
+
+        .art-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .art-sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        .sidebar-section {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-heading {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #a0a0a0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            padding-left: 0.5rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            color: #4a5568;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0.05) 100%);
+            color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #d63850 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .sidebar-link i {
+            width: 24px;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: 80px;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ========== SIDEBAR TOGGLE ========== */
+        body.sidebar-toggled .art-sidebar {
+            transform: translateX(-100%);
+        }
+
+        body.sidebar-toggled .main-content {
+            margin-left: 0;
+        }
+
+        /* ========== CARDS ========== */
+        .art-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .art-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-5px);
+        }
+
+        .card-header-art {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-title-art {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* ========== FOOTER ========== */
+        .art-footer {
+            background: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .art-footer .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .art-footer .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .art-footer .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 991px) {
+            .art-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            body.sidebar-toggled .art-sidebar {
+                transform: translateX(0);
+            }
+
+            .navbar-search {
+                max-width: 100%;
+                margin: 1rem 0;
+            }
+
+            .navbar-brand-modern {
+                font-size: 1.4rem;
+            }
+
+            .brand-icon-modern {
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        /* ========== BADGES ========== */
+        .badge-art {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .badge-seller {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-buyer {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn-art-primary {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #d63850 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .btn-art-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-art-secondary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-art-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 26, 46, 0.3);
         }
     </style>
+    {% endblock %}
 </head>
-<body class="sb-nav-fixed">
-
+<body>
     {% if hide_navbar is not defined or hide_navbar == false %}
-        {% include 'partials/_navbar.html.twig' %}
-        <div id="layoutSidenav">
-            {% include 'partials/_sidebarc.html.twig' %}
-    {% else %}
-        <div id="layoutSidenav">
-    {% endif %}
+        {# MODERN NAVBAR #}
+        <nav class="modern-navbar navbar navbar-expand-lg">
+            <div class="container-fluid px-4">
+                <!-- Toggle Button (Mobile) -->
+                <button class="btn btn-toggle-modern me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <!-- Brand Logo -->
+                <a class="navbar-brand-modern" href="{{ path('app_client') }}">
+                    <div class="brand-icon-modern">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <span>ArtMarket</span>
+                </a>
 
-        <div id="layoutSidenav_content">
+                <!-- Navbar Toggler for Mobile -->
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="fas fa-ellipsis-v text-dark"></i>
+                </button>
+
+                <!-- Navbar Content -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Search Bar (Center) -->
+                    <div class="navbar-search mx-auto my-3 my-lg-0">
+                        <input type="text" class="form-control" placeholder="Rechercher des œuvres, artistes...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+
+                    <!-- Right Side Nav Items -->
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <!-- Notifications -->
+                        <li class="nav-item position-relative">
+                            <a class="nav-link-modern" href="#">
+                                <i class="fas fa-bell"></i>
+                                <span class="d-lg-none">Notifications</span>
+                                <span class="notification-badge">3</span>
+                            </a>
+                        </li>
+
+                        <!-- Messages -->
+                        <li class="nav-item">
+                            <a class="nav-link-modern" href="#">
+                                <i class="fas fa-envelope"></i>
+                                <span class="d-lg-none">Messages</span>
+                            </a>
+                        </li>
+
+                        <!-- Favorites -->
+                        <li class="nav-item">
+                            <a class="nav-link-modern" href="#">
+                                <i class="fas fa-heart"></i>
+                                <span class="d-lg-none">Favoris</span>
+                            </a>
+                        </li>
+
+                        <!-- User Dropdown -->
+                        <li class="nav-item dropdown">
+                            <button class="user-btn-modern dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown">
+                                <div class="user-avatar-mini">JD</div>
+                                <span class="d-none d-lg-inline">Mon Compte</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item-modern" href="#">
+                                        <i class="fas fa-user"></i>
+                                        <span>Mon Profil</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item-modern" href="#">
+                                        <i class="fas fa-palette"></i>
+                                        <span>Mes Œuvres</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item-modern" href="#">
+                                        <i class="fas fa-shopping-bag"></i>
+                                        <span>Mes Commandes</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item-modern" href="#">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Paramètres</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item-modern" href="{{ path('app_logout') }}">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Déconnexion</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {# SIDEBAR #}
+        <aside class="art-sidebar">
+            <div class="sidebar-section">
+                <h6 class="sidebar-heading">Tableau de Bord</h6>
+                <a href="{{ path('app_client') }}" class="sidebar-link active">
+                    <i class="fas fa-home"></i>
+                    <span> Accueil</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <h6 class="sidebar-heading">Événements</h6>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span> Tous les Événements</span>
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-star"></i>
+                    <span> Événements Favoris</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <h6 class="sidebar-heading">Artistes</h6>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-palette"></i>
+                    <span> Tous les Artistes</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <h6 class="sidebar-heading">Transactions</h6>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span> Mes Achats</span>
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-cash-register"></i>
+                    <span> Mes Ventes</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <h6 class="sidebar-heading">Réclamation</h6>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span> Réclamer</span>
+                </a>
+            </div>
+        </aside>
+
+        {# MAIN CONTENT #}
+        <div class="main-content">
             <main>
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
                 {% block body %}{% endblock %}
             </main>
-            {% include 'partials/_footer.html.twig' %}
+
+            {# FOOTER #}
+            <footer class="art-footer">
+                <div class="container-fluid">
+                    <div class="footer-content">
+                        <div class="text-muted">&copy; 2024 ArtMarket - Plateforme d'Art</div>
+                        <div class="footer-links">
+                            <a href="#">À propos</a>
+                            <a href="#">Contact</a>
+                            <a href="#">CGU</a>
+                            <a href="#">Confidentialité</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-    </div>
+    {% else %}
+        {# PAGE SANS NAVBAR/SIDEBAR (ex: login, register) #}
+        
+    {% endif %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="{{ asset('js/scripts.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
-    <script src="{{ asset('js/datatables-simple-demo.js') }}"></script>
-
+    
     <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.modern-navbar');
+            if (navbar && window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else if (navbar) {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
         // Toggle sidebar
         const sidebarToggle = document.getElementById('sidebarToggle');
         if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function (e) {
+            sidebarToggle.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.body.classList.toggle('sb-sidenav-toggled');
+                document.body.classList.toggle('sidebar-toggled');
+                localStorage.setItem('sidebar-toggled', document.body.classList.contains('sidebar-toggled'));
+            });
+
+            // Restore sidebar state
+            if (localStorage.getItem('sidebar-toggled') === 'true') {
+                document.body.classList.add('sidebar-toggled');
+            }
+        }
+
+        // Active link highlight
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
+        // Search animation
+        const searchInput = document.querySelector('.navbar-search input');
+        if (searchInput) {
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
             });
         }
     </script>

@@ -13,10 +13,12 @@ class TablesController extends AbstractController
     {
         return $this->render('tables/index.html.twig');
     }
-
+    //
+    /*
     #[Route('/dashboard', name: 'app_dashboard')]
     public function dashboard(): Response
     {
         return $this->render('dashboard/index.html.twig'); // créer une page dashboard simple
-    }
+    }*/
+        //
 }

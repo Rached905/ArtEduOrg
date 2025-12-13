@@ -1,42 +1,634 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Users{% endblock %}
+{% block title %}Détails de l'Utilisateur{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .user-profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px 12px 0 0;
+        margin-bottom: 0;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        border: 5px solid white;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        margin: 0 auto 1rem;
+    }
+
+    .info-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-card .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+    }
+
+    .info-row {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.2s;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        min-width: 150px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-value {
+        color: #2c3e50;
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .role-badge-large {
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .role-badge-large.admin {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .role-badge-large.client {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .role-badge-large.vendor {
+        background: linear-gradient(135deg, #198754 0%, #157347 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+    }
+
+    .status-badge-large {
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .status-badge-large.active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge-large.inactive {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-indicator-large {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    .status-indicator-large.active {
+        background-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-indicator-large.inactive {
+        background-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .action-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -1.5rem;
+        top: 0.25rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .security-section {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-left: 4px solid #f59e0b;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1.5rem;
+    }
+
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb-item a {
+        color: #6c757d;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #0d6efd;
+    }
+
+    .stats-mini {
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .stats-mini:hover {
+        transform: scale(1.05);
+    }
+
+    .stats-mini-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .stats-mini-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Users</h1>
+<div class="container-fluid px-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mt-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ path('app_dashboard') }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ path('app_users_index') }}">
+                    <i class="fas fa-users"></i> Utilisateurs
+                </a>
+            </li>
+            <li class="breadcrumb-item active">{{ user.fullname }}</li>
+        </ol>
+    </nav>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ user.id }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ user.email }}</td>
-            </tr>
-            <tr>
-                <th>Password</th>
-                <td>{{ user.password }}</td>
-            </tr>
-            <tr>
-                <th>Fullname</th>
-                <td>{{ user.fullname }}</td>
-            </tr>
-            <tr>
-                <th>Role</th>
-                <td>{{ user.role.value }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ user.createdAt ? user.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- Profile Header Card -->
+    <div class="card info-card mb-4">
+        <div class="user-profile-header">
+            <div class="row align-items-center">
+                <div class="col-lg-3 text-center">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="mb-2">{{ user.fullname }}</h2>
+                    <p class="mb-3 opacity-75">
+                        <i class="fas fa-envelope me-2"></i>{{ user.email }}
+                    </p>
+                    <div class="d-flex gap-3 justify-content-center justify-content-lg-start flex-wrap">
+                        {% if user.role.value == 'ADMIN' %}
+                            <span class="role-badge-large admin">
+                                <i class="fas fa-user-shield"></i>
+                                Administrateur
+                            </span>
+                        {% elseif user.role.value == 'CLIENT' %}
+                            <span class="role-badge-large client">
+                                <i class="fas fa-user"></i>
+                                Client
+                            </span>
+                        {% elseif user.role.value == 'VENDEUR' %}
+                            <span class="role-badge-large vendor">
+                                <i class="fas fa-store"></i>
+                                Vendeur
+                            </span>
+                        {% endif %}
 
-    <a href="{{ path('app_users_index') }}">back to list</a>
+                        <span class="status-badge-large {{ user.isActive ? 'active' : 'inactive' }}">
+                            <span class="status-indicator-large {{ user.isActive ? 'active' : 'inactive' }}"></span>
+                            {{ user.isActive ? 'Actif' : 'Inactif' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 text-center mt-3 mt-lg-0">
+                    <div class="d-flex flex-column gap-2">
+                        <a href="{{ path('app_users_edit', {'id': user.id}) }}" class="btn btn-light action-btn">
+                            <i class="fas fa-edit"></i>
+                            Modifier
+                        </a>
+                        <a href="{{ path('app_users_index') }}" class="btn btn-outline-light action-btn">
+                            <i class="fas fa-arrow-left"></i>
+                            Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_users_edit', {'id': user.id}) }}">edit</a>
+    <div class="row g-4">
+        <!-- Informations Principales -->
+        <div class="col-lg-8">
+            <div class="card info-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informations Détaillées
+                </div>
+                <div class="card-body p-0">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-hashtag text-primary"></i>
+                            ID Utilisateur
+                        </div>
+                        <div class="info-value">
+                            <span class="badge bg-secondary">#{{ user.id }}</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user text-primary"></i>
+                            Nom Complet
+                        </div>
+                        <div class="info-value">{{ user.fullname }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-envelope text-primary"></i>
+                            Email
+                        </div>
+                        <div class="info-value">
+                            <a href="mailto:{{ user.email }}" class="text-decoration-none">
+                                {{ user.email }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-shield-alt text-primary"></i>
+                            Rôle
+                        </div>
+                        <div class="info-value">
+                            {% if user.role.value == 'ADMIN' %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-user-shield me-1"></i>
+                                    Administrateur
+                                </span>
+                            {% elseif user.role.value == 'CLIENT' %}
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-user me-1"></i>
+                                    Client
+                                </span>
+                            {% elseif user.role.value == 'VENDEUR' %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-store me-1"></i>
+                                    Vendeur
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-calendar-plus text-primary"></i>
+                            Créé le
+                        </div>
+                        <div class="info-value">
+                            {{ user.createdAt ? user.createdAt|date('d/m/Y à H:i') : 'Non disponible' }}
+                            {% if user.createdAt %}
+                                <small class="text-muted ms-2">
+                                    {% set diff = date(user.createdAt).diff(date('now')) %}
+(il y a 
+    {% if diff.y %}{{ diff.y }} an(s)
+    {% elseif diff.m %}{{ diff.m }} mois
+    {% elseif diff.d %}{{ diff.d }} jour(s)
+    {% elseif diff.h %}{{ diff.h }} heure(s)
+    {% elseif diff.i %}{{ diff.i }} minute(s)
+    {% else %}quelques secondes
+    {% endif %}
+)
 
-    {{ include('users/_delete_form.html.twig') }}
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-toggle-on text-primary"></i>
+                            Statut du Compte
+                        </div>
+                        <div class="info-value">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-indicator {{ user.isActive ? 'active' : 'inactive' }}" 
+                                      style="width: 10px; height: 10px; border-radius: 50%;"></span>
+                                <strong>{{ user.isActive ? 'Compte Actif' : 'Compte Inactif' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div class="security-section">
+                <h6 class="mb-2">
+                    <i class="fas fa-lock me-2"></i>
+                    Informations de Sécurité
+                </h6>
+                <p class="mb-0 small">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Le mot de passe est chiffré et ne peut pas être affiché pour des raisons de sécurité.
+                    Pour modifier le mot de passe, utilisez le bouton "Modifier" ci-dessus.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="card info-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Statistiques Rapides
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="stats-mini">
+                                <div class="stats-mini-value">0</div>
+                                <div class="stats-mini-label">Commandes</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-mini">
+                                <div class="stats-mini-value">0</div>
+                                <div class="stats-mini-label">Événements</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-mini">
+                                <div class="stats-mini-value">0</div>
+                                <div class="stats-mini-label">Ventes</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-mini">
+                                <div class="stats-mini-value">0</div>
+                                <div class="stats-mini-label">Réclamations</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="card info-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-cog me-2"></i>
+                    Actions Rapides
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_users_edit', {'id': user.id}) }}" 
+                           class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>
+                            Modifier l'Utilisateur
+                        </a>
+                        <button class="btn btn-warning" onclick="resetPassword()">
+                            <i class="fas fa-key me-2"></i>
+                            Réinitialiser le Mot de Passe
+                        </button>
+                        <button class="btn btn-info" onclick="sendEmail()">
+                            <i class="fas fa-envelope me-2"></i>
+                            Envoyer un Email
+                        </button>
+                        <hr>
+                        {{ include('users/_delete_form.html.twig', {
+                            'button_class': 'btn btn-danger w-100',
+                            'button_icon': 'fas fa-trash',
+                            'button_text': 'Supprimer l\'Utilisateur'
+                        }) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Timeline -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <i class="fas fa-history me-2"></i>
+                    Activité Récente
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="activity-icon bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">Compte créé</div>
+                                    <small class="text-muted">
+                                        {{ user.createdAt ? user.createdAt|date('d/m/Y à H:i') : 'Date inconnue' }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="activity-icon bg-primary bg-opacity-10 text-primary">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">Dernière connexion</div>
+                                    <small class="text-muted">Aucune donnée disponible</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function resetPassword() {
+    Swal.fire({
+        title: 'Réinitialiser le mot de passe',
+        text: 'Un email de réinitialisation sera envoyé à {{ user.email }}',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Envoyer',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Add your password reset logic here
+            Swal.fire(
+                'Envoyé !',
+                'L\'email de réinitialisation a été envoyé.',
+                'success'
+            );
+        }
+    });
+}
+
+function sendEmail() {
+    Swal.fire({
+        title: 'Envoyer un email',
+        input: 'textarea',
+        inputLabel: 'Message',
+        inputPlaceholder: 'Écrivez votre message ici...',
+        showCancelButton: true,
+        confirmButtonColor: '#0dcaf0',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Envoyer',
+        cancelButtonText: 'Annuler',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Vous devez écrire un message !';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Add your email sending logic here
+            Swal.fire(
+                'Envoyé !',
+                'Votre message a été envoyé à {{ user.email }}',
+                'success'
+            );
+        }
+    });
+}
+
+// Animate cards on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.info-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 50);
+        }, index * 100);
+    });
+});
+</script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
