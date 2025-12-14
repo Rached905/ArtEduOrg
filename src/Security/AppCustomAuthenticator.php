@@ -30,7 +30,7 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $email = $request->get('email'); // si tu utilises form classique
+        $email = $request->get('email');
         $password = $request->get('password');
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
@@ -52,23 +52,23 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        /** @var UserInterface $user */
+        /** @var \App\Entity\Users $user */
         $user = $token->getUser();
 
-        // Vérifie si l'utilisateur est bien ton entité Users
-        if (method_exists($user, 'getRole')) {
-            $role = $user->getRole()->value; // récupère le string du Role
+        // ✅ Vérifie si l'utilisateur a un rôle défini
+        if (method_exists($user, 'getRole') && $user->getRole() !== null) {
+            $role = $user->getRole();
 
             return match($role) {
-                Role::ADMIN->value => new RedirectResponse('/dashboard'),
-                Role::AGENT->value => new RedirectResponse('/client'),
-                Role::USER->value  => new RedirectResponse('/vendeur'),
-                default => new RedirectResponse('/'), // fallback
+                Role::ADMIN => new RedirectResponse($this->urlGenerator->generate('app_dashboard')),
+                Role::AGENT => new RedirectResponse($this->urlGenerator->generate('app_client')),
+                Role::USER  => new RedirectResponse($this->urlGenerator->generate('app_vendeur')),
+                default => new RedirectResponse($this->urlGenerator->generate('app_welcome')),
             };
         }
 
-        // Fallback si pas de rôle détecté
-        return new RedirectResponse('/');
+        // ✅ Si pas de rôle, rediriger vers choix de rôle
+        return new RedirectResponse($this->urlGenerator->generate('app_choose_role'));
     }
 
     protected function getLoginUrl(Request $request): string

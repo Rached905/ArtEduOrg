@@ -1,0 +1,91 @@
+{# templates/registration/choose_role.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Choisir votre rôle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        p {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 40px;
+        }
+        .role-cards {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+        .role-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            width: 250px;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        .role-card i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .role-card.client i {
+            color: #667eea;
+        }
+        .role-card.vendeur i {
+            color: #764ba2;
+        }
+        .role-card h2 {
+            margin: 0 0 15px 0;
+            font-size: 24px;
+        }
+        .role-card p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenue {{ app.user.fullname }} !</h1>
+        <p>Veuillez choisir votre rôle pour continuer</p>
+        
+        <div class="role-cards">
+            <a href="{{ path('app_set_role', {role: 'client'}) }}" class="role-card client">
+                <i class="fas fa-shopping-cart"></i>
+                <h2>Client</h2>
+                <p>Je souhaite acheter des produits sur la plateforme</p>
+            </a>
+            
+            <a href="{{ path('app_set_role', {role: 'vendeur'}) }}" class="role-card vendeur">
+                <i class="fas fa-store"></i>
+                <h2>Vendeur</h2>
+                <p>Je souhaite vendre mes produits sur la plateforme</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -61,8 +61,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?string $fullname = null;
 
-    #[ORM\Column(enumType: Role::class)]
-    #[Assert\NotNull(message: "Le rôle est obligatoire")]
+    #[ORM\Column(enumType: Role::class, nullable: true)]
     private ?Role $role = null;
 
     #[ORM\Column(options: ["default" => "CURRENT_TIMESTAMP"])]
@@ -76,10 +75,13 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?bool $isActive = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $googleId = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->isActive = true; // Par défaut, le compte est actif
+        $this->isActive = true;
     }
 
     public function getId(): ?int
@@ -94,7 +96,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = strtolower(trim($email)); // Normalisation
+        $this->email = strtolower(trim($email));
         return $this;
     }
 
@@ -116,7 +118,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setFullname(string $fullname): static
     {
-        $this->fullname = trim($fullname); // Suppression espaces inutiles
+        $this->fullname = trim($fullname);
         return $this;
     }
 
@@ -125,7 +127,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->role;
     }
 
-    public function setRole(Role $role): static
+    public function setRole(?Role $role): static
     {
         $this->role = $role;
         return $this;
@@ -142,6 +144,33 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+        return $this;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): self
+    {
+        $this->googleId = $googleId;
+        return $this;
+    }
+
     // ---------------------------------------------------------------------
     //  🔐  OBLIGATOIRE pour Symfony Security
     // ---------------------------------------------------------------------
@@ -153,26 +182,16 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [$this->role->value];
+        // ✅ UNE SEULE méthode getRoles() - gère le cas null
+        if ($this->role === null) {
+            return ['ROLE_USER'];
+        }
+        
+        return ['ROLE_' . $this->role->value];
     }
 
     public function eraseCredentials(): void
     {
         // Nettoyer les données sensibles temporaires si nécessaire
     }
-
-    public function isActive(): ?bool
-    {
-        return $this->isActive;
-    }
-
-    public function setIsActive(bool $isActive): static
-    {
-        $this->isActive = $isActive;
-        return $this;
-    }
-    public function getIsActive(): ?bool
-{
-    return $this->isActive;
-}
 }

@@ -440,16 +440,15 @@
                     </div>
 
                     <div class="social-login">
-                        <button class="btn btn-social">
-                            <i class="fab fa-google"></i>
-                            Google
-                        </button>
-                        <button class="btn btn-social">
-                            <i class="fab fa-facebook-f"></i>
-                            Facebook
-                        </button>
-                    </div>
-                </div>
+    <button class="btn btn-social" type="button" onclick="window.location.href='{{ path('connect_google_start') }}'">
+        <i class="fab fa-google"></i>
+        Google
+    </button>
+    <button class="btn btn-social" type="button" disabled>
+        <i class="fab fa-facebook-f"></i>
+        Facebook
+    </button>
+</div>
 
                 <div class="card-footer text-center">
                     <div class="small">

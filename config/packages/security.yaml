@@ -1,17 +1,14 @@
 security:
-    # Password hashing
     password_hashers:
         App\Entity\Users:
-            algorithm: plaintext  # ⚠️ À changer en production pour 'auto'
+            algorithm: auto
 
-    # User provider (base de données)
     providers:
         app_user_provider:
             entity:
                 class: App\Entity\Users
                 property: email
 
-    # Firewalls
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -20,8 +17,13 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            user_checker: App\Security\UserChecker  # ← ✅ Ajouter cette ligne
-            custom_authenticator: App\Security\AppCustomAuthenticator
+            user_checker: App\Security\UserChecker
+            
+            custom_authenticators:
+                - App\Security\AppCustomAuthenticator
+                - App\Security\GoogleAuthenticator
+            
+            entry_point: App\Security\AppCustomAuthenticator
             
             logout:
                 path: app_logout
@@ -31,18 +33,16 @@ security:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
-                # always_remember_me: true
 
-    # Access control
     access_control:
         - { path: ^/welcome, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
         - { path: ^/reset-password, roles: PUBLIC_ACCESS }
-        # Protéger toutes les autres pages
-        # - { path: ^/, roles: ROLE_USER }
+        - { path: ^/connect/google, roles: PUBLIC_ACCESS }
+        - { path: ^/choose-role, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/set-role, roles: IS_AUTHENTICATED_FULLY }
 
-# Configuration spécifique pour l'environnement test
 when@test:
     security:
         password_hashers:
