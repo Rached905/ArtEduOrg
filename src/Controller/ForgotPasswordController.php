@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class ForgotPasswordController extends AbstractController
@@ -118,13 +117,12 @@ final class ForgotPasswordController extends AbstractController
         return new JsonResponse(['message' => 'Code vérifié avec succès']);
     }
 
-    // Réinitialiser le mot de passe
+    // Réinitialiser le mot de passe (SANS HACHAGE - NON SÉCURISÉ)
     #[Route('/reset-password', name: 'reset_password', methods: ['POST'])]
     public function resetPassword(
         Request $request, 
         UsersRepository $usersRepo, 
         EntityManagerInterface $em, 
-        UserPasswordHasherInterface $hasher,
         PasswordResetTokenRepository $tokenRepo
     ): JsonResponse
     {
@@ -162,9 +160,8 @@ final class ForgotPasswordController extends AbstractController
             return new JsonResponse(['message' => 'Code expiré'], 400);
         }
 
-        // Hasher et mettre à jour le mot de passe
-        $hashedPassword = $hasher->hashPassword($user, $password);
-        $user->setPassword($hashedPassword);
+        // ✅ MODIFICATION : Stocker le mot de passe EN CLAIR (NON SÉCURISÉ)
+        $user->setPassword($password);
         
         // Supprimer le token utilisé pour éviter sa réutilisation
         $em->remove($token);
@@ -172,6 +169,4 @@ final class ForgotPasswordController extends AbstractController
 
         return new JsonResponse(['message' => 'Mot de passe réinitialisé avec succès']);
     }
-
-    
 }

@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use App\Security\AppCustomAuthenticator;
 
 class RegistrationController extends AbstractController
 {
@@ -30,7 +32,13 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/set-role/{role}', name: 'app_set_role')]
-    public function setRole(string $role, EntityManagerInterface $entityManager): Response
+    public function setRole(
+        string $role, 
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UserAuthenticatorInterface $userAuthenticator,
+        AppCustomAuthenticator $authenticator
+    ): Response
     {
         $user = $this->getUser();
         
@@ -52,8 +60,12 @@ class RegistrationController extends AbstractController
 
         $this->addFlash('success', 'Votre rôle a été défini avec succès !');
         
-        // ✅ Rediriger selon le rôle choisi
-        return $this->redirectUserByRole($user);
+        // ✅ Réauthentifier l'utilisateur avec le nouveau rôle
+        return $userAuthenticator->authenticateUser(
+            $user,
+            $authenticator,
+            $request
+        );
     }
 
     /**

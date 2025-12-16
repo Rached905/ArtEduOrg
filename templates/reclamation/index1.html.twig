@@ -1,0 +1,524 @@
+{% extends 'basec.html.twig' %}
+
+{% block title %}Mes Réclamations{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .reclamations-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .reclamations-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .reclamations-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.95;
+    }
+
+    .btn-new-reclamation {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-new-reclamation:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        color: #764ba2;
+    }
+
+    .reclamation-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid transparent;
+    }
+
+    .reclamation-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .reclamation-card.status-en-attente {
+        border-left-color: #fbbf24;
+    }
+
+    .reclamation-card.status-en-cours {
+        border-left-color: #3b82f6;
+    }
+
+    .reclamation-card.status-resolue {
+        border-left-color: #10b981;
+    }
+
+    .reclamation-card.status-rejetee {
+        border-left-color: #ef4444;
+    }
+
+    .reclamation-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .reclamation-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0;
+        flex: 1;
+    }
+
+    .reclamation-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-en-attente {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        color: #92400e;
+    }
+
+    .status-en-cours {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1e40af;
+    }
+
+    .status-resolue {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #065f46;
+    }
+
+    .status-rejetee {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+    }
+
+    .reclamation-meta {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .meta-item i {
+        color: #667eea;
+    }
+
+    .reclamation-description {
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .reclamation-response {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-left: 4px solid #10b981;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+
+    .response-label {
+        font-weight: 600;
+        color: #065f46;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .response-text {
+        color: #047857;
+        line-height: 1.6;
+    }
+
+    .reclamation-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #f1f5f9;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-delete {
+        background: white;
+        color: #ef4444;
+        border: 2px solid #ef4444;
+    }
+
+    .btn-delete:hover {
+        background: #ef4444;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        color: #cbd5e0;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        color: #2d3748;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #718096;
+        margin-bottom: 2rem;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 1rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-icon.total {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stat-icon.pending {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+    }
+
+    .stat-icon.resolved {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .reclamation-card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @media (max-width: 768px) {
+        .reclamations-header {
+            padding: 1.5rem;
+        }
+
+        .reclamations-header h1 {
+            font-size: 1.5rem;
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .reclamation-header-row {
+            flex-direction: column;
+        }
+
+        .reclamation-meta {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .reclamation-actions {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="reclamations-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1>
+                    <i class="fas fa-exclamation-circle"></i>
+                    Mes Réclamations
+                </h1>
+                <p>Suivez l'état de vos réclamations et leurs réponses</p>
+            </div>
+            <a href="{{ path('reclamation_new') }}" class="btn-new-reclamation">
+                <i class="fas fa-plus"></i>
+                Nouvelle Réclamation
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-value">{{ reclamations|length }}</div>
+            <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">
+                {{ reclamations|filter(r => r.statusReclamation == 'en_attente')|length }}
+            </div>
+            <div class="stat-label">En Attente</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon resolved">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">
+                {{ reclamations|filter(r => r.statusReclamation == 'resolue')|length }}
+            </div>
+            <div class="stat-label">Résolues</div>
+        </div>
+    </div>
+
+    <!-- Reclamations List -->
+    {% if reclamations is empty %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>Aucune réclamation</h3>
+            <p>Vous n'avez pas encore soumis de réclamation.</p>
+            <a href="{{ path('reclamation_new') }}" class="btn-new-reclamation">
+                <i class="fas fa-plus"></i>
+                Créer ma première réclamation
+            </a>
+        </div>
+    {% else %}
+        {% for reclamation in reclamations %}
+            <div class="reclamation-card status-{{ reclamation.statusReclamation.value|replace({'_': '-'}) }}">
+                <div class="reclamation-header-row">
+                    <h3 class="reclamation-title">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {{ reclamation.objet }}
+                    </h3>
+                    <span class="reclamation-status status-{{ reclamation.statusReclamation.value|replace({'_': '-'}) }}">
+                        {% if reclamation.statusReclamation == 'en_attente' %}
+                            <i class="fas fa-clock"></i> En Attente
+                        {% elseif reclamation.statusReclamation == 'en_cours' %}
+                            <i class="fas fa-spinner"></i> En Cours
+                        {% elseif reclamation.statusReclamation == 'resolue' %}
+                            <i class="fas fa-check-circle"></i> Résolue
+                        {% elseif reclamation.statusReclamation == 'rejetee' %}
+                            <i class="fas fa-times-circle"></i> Rejetée
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="reclamation-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-tag"></i>
+                        <strong>Type:</strong> {{ reclamation.typeReclamation.value|replace({'_': ' '})|title }}
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <strong>Date:</strong> {{ reclamation.dateTime|date('d/m/Y à H:i') }}
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-hashtag"></i>
+                        <strong>ID:</strong> #{{ reclamation.id }}
+                    </div>
+                </div>
+
+                <div class="reclamation-description">
+                    <strong><i class="fas fa-align-left me-2"></i>Description:</strong><br>
+                    {{ reclamation.description|length > 200 ? reclamation.description|slice(0, 200) ~ '...' : reclamation.description }}
+                </div>
+
+                {% if reclamation.reponseAdmin %}
+                    <div class="reclamation-response">
+                        <div class="response-label">
+                            <i class="fas fa-reply"></i>
+                            Réponse de l'administrateur
+                        </div>
+                        <div class="response-text">
+                            {{ reclamation.reponseAdmin }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="reclamation-actions">
+                    
+                    {% if reclamation.statusReclamation == 'en_attente' %}
+                        <form method="post" action="{{ path('reclamation_delete', {'id': reclamation.id}) }}" 
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?');" 
+                              style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                            <button type="submit" class="btn-action btn-delete">
+                                <i class="fas fa-trash"></i>
+                                Supprimer
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Animation au scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    document.querySelectorAll('.reclamation-card').forEach(card => {
+        card.style.animationPlayState = 'paused';
+        observer.observe(card);
+    });
+
+    // Confirmation de suppression avec style
+    document.querySelectorAll('form[onsubmit]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Supprimer la réclamation ?',
+                    text: "Cette action est irréversible !",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Oui, supprimer',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            } else {
+                if (confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?')) {
+                    form.submit();
+                }
+            }
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}

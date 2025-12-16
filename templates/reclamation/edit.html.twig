@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la réclamation{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Modifier la réclamation #{{ reclamation.id }}</h1>
+
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_label(form.objet, 'Objet') }}
+            {{ form_widget(form.objet, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.objet) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description, 'Description') }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.typeReclamation, 'Type de réclamation') }}
+            {{ form_widget(form.typeReclamation, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.typeReclamation) }}
+        </div>
+
+        
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{{ path('reclamation_index') }}" class="btn btn-secondary">Annuler</a>
+    {{ form_end(form, {'render_rest': false}) }}
+
+</div>
+{% endblock %}

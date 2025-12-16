@@ -505,7 +505,7 @@
                             <i class="fas fa-key me-2"></i>
                             Réinitialiser le Mot de Passe
                         </button>
-                        <button class="btn btn-info" onclick="sendEmail()">
+                        <button class="btn btn-info" onclick="sendEmail('{{ user.email }}')">
                             <i class="fas fa-envelope me-2"></i>
                             Envoyer un Email
                         </button>
@@ -583,7 +583,7 @@ function resetPassword() {
     });
 }
 
-function sendEmail() {
+function sendEmail(userEmail) {
     Swal.fire({
         title: 'Envoyer un email',
         input: 'textarea',
@@ -601,12 +601,49 @@ function sendEmail() {
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            // Add your email sending logic here
-            Swal.fire(
-                'Envoyé !',
-                'Votre message a été envoyé à {{ user.email }}',
-                'success'
-            );
+            // ✅ Envoi réel avec fetch
+            Swal.fire({
+                title: 'Envoi en cours...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: result.value,
+                    email: userEmail
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire(
+                        'Envoyé !',
+                        `Votre message a été envoyé à ${userEmail}`,
+                        'success'
+                    );
+                } else {
+                    Swal.fire(
+                        'Erreur',
+                        data.error || 'Une erreur est survenue',
+                        'error'
+                    );
+                }
+            })
+            .catch(error => {
+                Swal.fire(
+                    'Erreur',
+                    'Impossible d\'envoyer l\'email',
+                    'error'
+                );
+                console.error('Error:', error);
+            });
         }
     });
 }

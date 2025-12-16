@@ -1,0 +1,572 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Réclamation #{{ reclamation.id }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .reclamation-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px 12px 0 0;
+        margin-bottom: 0;
+    }
+
+    .reclamation-id {
+        font-size: 3rem;
+        font-weight: 700;
+        opacity: 0.9;
+    }
+
+    .info-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-card .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+    }
+
+    .info-row {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.2s;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        min-width: 150px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-value {
+        color: #2c3e50;
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .description-box {
+        background-color: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 1.5rem;
+        border-radius: 8px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .response-box {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        border-left: 4px solid #10b981;
+        padding: 1.5rem;
+        border-radius: 8px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .no-response-box {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        border-left: 4px solid #ef4444;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .status-badge-large {
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .status-badge-large.en-attente {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+    }
+
+    .status-badge-large.traitee {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge-large.rejetee {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .type-badge {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-respond {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+
+    .btn-respond:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        color: white;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -1.5rem;
+        top: 0.25rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+
+    .user-info-box {
+        background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        border-left: 4px solid #6366f1;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb-item a {
+        color: #6c757d;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #667eea;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mt-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ path('app_dashboard') }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ path('reclamation_index') }}">
+                    <i class="fas fa-clipboard-list"></i> Réclamations
+                </a>
+            </li>
+            <li class="breadcrumb-item active">Réclamation #{{ reclamation.id }}</li>
+        </ol>
+    </nav>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <!-- Header Card -->
+    <div class="card info-card mb-4">
+        <div class="reclamation-header">
+            <div class="row align-items-center">
+                <div class="col-lg-2 text-center">
+                    <div class="reclamation-id">
+                        #{{ reclamation.id }}
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <h2 class="mb-2">{{ reclamation.objet }}</h2>
+                    <div class="d-flex gap-3 flex-wrap mt-3">
+                        <span class="type-badge">
+                            <i class="fas fa-tag"></i>
+                            {{ reclamation.typeReclamation.value }}
+                        </span>
+                        <span class="status-badge-large {{ reclamation.statusReclamation.value|replace({'_': '-'}) }}">
+                            <i class="fas fa-circle-notch"></i>
+                            {{ reclamation.statusReclamation.value|replace({'_': ' '})|title }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-3 text-center mt-3 mt-lg-0">
+                    <div class="d-flex flex-column gap-2">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <button onclick="respondToReclamation({{ reclamation.id }}, '{{ reclamation.objet|e('js') }}', '{{ reclamation.reponseAdmin|default('')|e('js') }}')" 
+                                    class="btn btn-respond action-btn">
+                                <i class="fas fa-reply"></i>
+                                {{ reclamation.reponseAdmin ? 'Modifier la réponse' : 'Répondre' }}
+                            </button>
+                        {% endif %}
+                        <a href="{{ path('reclamation_edit', {'id': reclamation.id}) }}" 
+                           class="btn btn-warning action-btn">
+                            <i class="fas fa-edit"></i>
+                            Modifier
+                        </a>
+                        <a href="{{ path('reclamation_index') }}" 
+                           class="btn btn-outline-light action-btn">
+                            <i class="fas fa-arrow-left"></i>
+                            Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Colonne principale -->
+        <div class="col-lg-8">
+            <!-- Description -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <i class="fas fa-file-alt me-2"></i>
+                    Description de la réclamation
+                </div>
+                <div class="card-body">
+                    <div class="description-box">
+                        {{ reclamation.description }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Réponse Admin -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <i class="fas fa-reply me-2"></i>
+                    Réponse de l'administrateur
+                </div>
+                <div class="card-body">
+                    {% if reclamation.reponseAdmin %}
+                        <div class="response-box">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fas fa-user-shield text-success"></i>
+                                <strong class="text-success">Réponse officielle</strong>
+                            </div>
+                            {{ reclamation.reponseAdmin }}
+                        </div>
+                    {% else %}
+                        <div class="no-response-box">
+                            <i class="fas fa-hourglass-half fa-3x text-danger mb-3"></i>
+                            <h5 class="text-danger">Aucune réponse pour le moment</h5>
+                            <p class="mb-0 text-muted">Votre réclamation est en cours de traitement. Vous recevrez une notification dès qu'une réponse sera disponible.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Informations de l'utilisateur -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <i class="fas fa-user me-2"></i>
+                    Informations de l'utilisateur
+                </div>
+                <div class="card-body p-0">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-id-badge text-primary"></i>
+                            User ID
+                        </div>
+                        <div class="info-value">
+                            <span class="badge bg-dark">#{{ reclamation.userId }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+    <div class="info-label">
+        <i class="fas fa-envelope text-primary"></i>
+        Email
+    </div>
+    <div class="info-value">
+        {% if reclamation.userEmail %}
+            <a href="mailto:{{ reclamation.userEmail }}" class="text-decoration-none">
+                {{ reclamation.userEmail }}
+            </a>
+        {% else %}
+            <span class="text-muted">Non disponible</span>
+        {% endif %}
+    </div>
+</div>
+
+                </div>
+            </div>
+
+            <!-- Détails de la réclamation -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Détails
+                </div>
+                <div class="card-body p-0">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-hashtag text-primary"></i>
+                            ID
+                        </div>
+                        <div class="info-value">
+                            <span class="badge bg-secondary">#{{ reclamation.id }}</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-tag text-primary"></i>
+                            Type
+                        </div>
+                        <div class="info-value">
+                            <span class="badge bg-info">{{ reclamation.typeReclamation.value }}</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-flag text-primary"></i>
+                            Statut
+                        </div>
+                        <div class="info-value">
+                            <span class="badge bg-{{ reclamation.statusReclamation.value == 'en_attente' ? 'warning' : (reclamation.statusReclamation.value == 'traitee' ? 'success' : 'danger') }}">
+                                {{ reclamation.statusReclamation.value|replace({'_': ' '})|title }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-calendar text-primary"></i>
+                            Date
+                        </div>
+                        <div class="info-value">
+                            {{ reclamation.dateTime|date('d/m/Y') }}
+                            <br>
+                            <small class="text-muted">{{ reclamation.dateTime|date('H:i') }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <i class="fas fa-history me-2"></i>
+                    Historique
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;" class="bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">Réclamation créée</div>
+                                    <small class="text-muted">
+                                        {{ reclamation.dateTime|date('d/m/Y à H:i') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% if reclamation.reponseAdmin %}
+                            <div class="timeline-item">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;" class="bg-primary bg-opacity-10 text-primary">
+                                        <i class="fas fa-reply"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold">Réponse admin ajoutée</div>
+                                        <small class="text-muted">Date non disponible</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function respondToReclamation(id, objet, currentResponse) {
+    Swal.fire({
+        title: 'Répondre à la réclamation',
+        html: `
+            <div class="text-start mb-3">
+                <strong>Objet :</strong> ${objet}
+            </div>
+        `,
+        input: 'textarea',
+        inputLabel: 'Votre réponse',
+        inputPlaceholder: 'Écrivez votre réponse ici...',
+        inputValue: currentResponse,
+        inputAttributes: {
+            'aria-label': 'Votre réponse',
+            'style': 'min-height: 150px;'
+        },
+        showCancelButton: true,
+        confirmButtonColor: '#667eea',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fas fa-paper-plane me-2"></i>Envoyer',
+        cancelButtonText: '<i class="fas fa-times me-2"></i>Annuler',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Vous devez écrire une réponse !';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Envoi en cours...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(`/reclamation/${id}/respond`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    response: result.value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Réponse envoyée !',
+                        text: 'La réponse a été enregistrée avec succès.',
+                        confirmButtonColor: '#667eea'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: data.message || 'Une erreur est survenue',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: 'Impossible d\'envoyer la réponse',
+                    confirmButtonColor: '#dc3545'
+                });
+            });
+        }
+    });
+}
+
+// Animation au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.info-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 50);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

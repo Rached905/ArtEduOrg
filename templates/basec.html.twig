@@ -684,9 +684,9 @@
 
             <div class="sidebar-section">
                 <h6 class="sidebar-heading">Réclamation</h6>
-                <a href="#" class="sidebar-link">
+                <a href="{{ path('reclamation_index_user') }}" class="sidebar-link">
                     <i class="fas fa-exclamation-circle"></i>
-                    <span> Réclamer</span>
+                    <span> Mes reclamations</span>
                 </a>
             </div>
         </aside>
@@ -706,21 +706,7 @@
                 {% block body %}{% endblock %}
             </main>
 
-            {# FOOTER #}
-            <footer class="art-footer">
-                <div class="container-fluid">
-                    <div class="footer-content">
-                        <div class="text-muted">&copy; 2024 ArtMarket - Plateforme d'Art</div>
-                        <div class="footer-links">
-                            <a href="#">À propos</a>
-                            <a href="#">Contact</a>
-                            <a href="#">CGU</a>
-                            <a href="#">Confidentialité</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </div>
+            
     {% else %}
         {# PAGE SANS NAVBAR/SIDEBAR (ex: login, register) #}
         
