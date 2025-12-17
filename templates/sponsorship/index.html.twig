@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Parrainages{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-gift"></i>
+                Liste des Parrainages
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Parrainages</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_sponsorship_new') }}" class="btn btn-add">
+            <i class="fas fa-plus me-2"></i>Créer un Parrainage
+        </a>
+    </div>
+</div>
+
+{% if sponsorships|length > 0 %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Sponsor</th>
+                            <th>Type</th>
+                            <th>Type de parrainage</th>
+                            <th>Montant</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for sponsorship in sponsorships %}
+                        <tr>
+                            <td>{{ sponsorship.description|slice(0, 50) }}{% if sponsorship.description|length > 50 %}...{% endif %}</td>
+                            <td><strong>{{ sponsorship.sponsor.name }}</strong></td>
+                            <td><span class="badge bg-secondary">{{ sponsorship.type.value }}</span></td>
+                            <td><span class="badge bg-primary">{{ sponsorship.sponsorshipType.value }}</span></td>
+                            <td><strong class="text-success">{{ sponsorship.amount|number_format(2, ',', ' ') }} €</strong></td>
+                            <td>
+                                <a href="{{ path('app_sponsorship_show', {'id': sponsorship.id}) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('app_sponsorship_edit', {'id': sponsorship.id}) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_sponsorship_delete', {'id': sponsorship.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce parrainage ?');" style="display: inline-block;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sponsorship.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body">
+            <div class="alert alert-info">
+                <p class="mb-0">Aucun parrainage trouvé. <a href="{{ path('app_sponsorship_new') }}">Créer le premier parrainage</a></p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+

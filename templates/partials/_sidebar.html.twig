@@ -1,33 +1,66 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark modern-sidenav" id="layoutSidenav_nav">
     <div class="sb-sidenav-menu">
         <div class="nav">
-            <div class="sb-sidenav-menu-heading">Core</div>
+            <div class="sb-sidenav-menu-heading">CORE</div>
             <a class="nav-link {{ app.request.attributes.get('_route') == 'app_dashboard' ? 'active' : '' }}" href="{{ path('app_dashboard') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
                 Accueil
             </a>
 
-            <div class="sb-sidenav-menu-heading">Management</div>
+            <div class="sb-sidenav-menu-heading">MANAGEMENT</div>
             
             <a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_users' ? 'active' : '' }}" href="{{ path('app_users_index') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                 Utilisateurs
             </a>
 
-            <a class="nav-link" href="#">
-                <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
-                Événements
-            </a>
+            <div class="nav-link-group">
+                <a href="{{ path('app_event_stats') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_event_stats' ? 'active' : '' }}" id="events-link">
+                    <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
+                    Événements
+                    <i class="fas fa-chevron-down ms-auto submenu-arrow" id="events-arrow" onclick="event.stopPropagation(); toggleSubmenu('events-submenu');" style="cursor: pointer;"></i>
+                </a>
+                <div class="submenu" id="events-submenu" style="display: none;">
+                    <a href="{{ path('app_event_new') }}" class="submenu-btn btn-dark-blue">
+                        <i class="fas fa-calendar-plus"></i> Créer un Événement
+                    </a>
+                    <a href="{{ path('app_event_review_new') }}" class="submenu-btn btn-orange">
+                        <i class="fas fa-star"></i> Créer un Avis
+                    </a>
+                </div>
+            </div>
 
-            <a class="nav-link" href="#">
-                <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
-                Ventes
-            </a>
+            <div class="nav-link-group">
+                <a href="{{ path('app_sales_stats') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_sales_stats' ? 'active' : '' }}" id="sales-link">
+                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                    Ventes
+                    <i class="fas fa-chevron-down ms-auto submenu-arrow" id="sales-arrow" onclick="event.stopPropagation(); toggleSubmenu('sales-submenu');" style="cursor: pointer;"></i>
+                </a>
+                <div class="submenu" id="sales-submenu" style="display: none;">
+                    <a href="{{ path('app_ticket_new') }}" class="submenu-btn btn-green">
+                        <i class="fas fa-ticket-alt"></i> Créer un Ticket
+                    </a>
+                </div>
+            </div>
 
-            <a class="nav-link" href="#">
-                <div class="sb-nav-link-icon"><i class="fas fa-handshake"></i></div>
-                Sponsoring
-            </a>
+            <div class="nav-link-group">
+                <a href="{{ path('app_sponsor_stats') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_sponsor_stats' ? 'active' : '' }}" id="sponsoring-link">
+                    <div class="sb-nav-link-icon"><i class="fas fa-handshake"></i></div>
+                    Sponsoring
+                    <i class="fas fa-chevron-down ms-auto submenu-arrow" id="sponsoring-arrow" onclick="event.stopPropagation(); toggleSubmenu('sponsoring-submenu');" style="cursor: pointer;"></i>
+                </a>
+                <div class="submenu" id="sponsoring-submenu" style="display: none;">
+                    <a href="{{ path('app_sponsor_new') }}" class="submenu-btn btn-light-blue">
+                        <i class="fas fa-user-plus"></i> Créer un Sponsor
+                    </a>
+                    <a href="{{ path('app_sponsor_contract_new') }}" class="submenu-btn btn-green">
+                        <i class="fas fa-file-contract"></i> Créer un Contrat
+                    </a>
+                    <a href="{{ path('app_sponsorship_new') }}" class="submenu-btn btn-light-blue">
+                        <i class="fas fa-gift"></i> Créer un Parrainage
+                    </a>
+                </div>
+            </div>
 
             <a class="nav-link {{ app.request.attributes.get('_route') starts with 'reclamation' ? 'active' : '' }}" href="{{ path('reclamation_index') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-exclamation-circle"></i></div>
@@ -256,4 +289,92 @@
             transform: scale(1.1);
         }
     }
+
+    .nav-link-group {
+        margin-bottom: 0.25rem;
+    }
+
+    .submenu {
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .submenu-btn {
+        padding: 0.625rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        width: 100%;
+    }
+
+    .submenu-btn.btn-dark-blue {
+        background: linear-gradient(135deg, #1a1f36 0%, #0f1419 100%);
+        color: white;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .submenu-btn.btn-orange {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: white;
+    }
+
+    .submenu-btn.btn-green {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .submenu-btn.btn-light-blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+
+    .submenu-btn:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .submenu-arrow {
+        transition: transform 0.3s ease;
+        font-size: 0.75rem;
+    }
+
+    .submenu.active ~ .submenu-arrow,
+    .nav-link-group.active .submenu-arrow {
+        transform: rotate(180deg);
+    }
 </style>
+
+<script>
+function toggleSubmenu(id) {
+    const submenu = document.getElementById(id);
+    const arrow = document.getElementById(id.replace('-submenu', '-arrow'));
+    const isVisible = submenu.style.display !== 'none';
+    
+    submenu.style.display = isVisible ? 'none' : 'block';
+    if (arrow) {
+        arrow.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+}
+
+// Auto-expand submenu if current route matches
+document.addEventListener('DOMContentLoaded', function() {
+    {% if app.request.attributes.get('_route') starts with 'app_event' and app.request.attributes.get('_route') != 'app_event_stats' %}
+        toggleSubmenu('events-submenu');
+    {% elseif app.request.attributes.get('_route') starts with 'app_ticket' and app.request.attributes.get('_route') != 'app_sales_stats' %}
+        toggleSubmenu('sales-submenu');
+    {% elseif (app.request.attributes.get('_route') starts with 'app_sponsor' or app.request.attributes.get('_route') starts with 'app_sponsorship') and app.request.attributes.get('_route') != 'app_sponsor_stats' %}
+        toggleSubmenu('sponsoring-submenu');
+    {% endif %}
+});
+</script>

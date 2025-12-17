@@ -13,40 +13,6 @@
         box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
     }
 
-    .stats-card {
-        border: none;
-        border-radius: 12px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        color: white;
-        height: 100%;
-    }
-
-    .stats-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
-
-    .stats-card.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .stats-card.success { background: linear-gradient(135deg, #0cebeb 0%, #20e3b2 100%); }
-    .stats-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-    .stats-card.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-
-    .stats-icon {
-        font-size: 3rem;
-        opacity: 0.3;
-        position: absolute;
-        right: 1.5rem;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-
-    .stats-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        line-height: 1;
-    }
 
     .quick-action-card {
         border: none;
@@ -183,7 +149,7 @@
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <div>
                 <h1><i class="fas fa-tachometer-alt me-2"></i>Tableau de Bord</h1>
-                <p class="mb-0">Bienvenue, <strong>{{ app.user.fullname }}</strong> ! Voici un aperçu de votre système.</p>
+                <p class="mb-0">Bienvenue{% if app.user %}, <strong>{{ app.user.fullname }}</strong>{% endif %} ! Voici un aperçu de votre système.</p>
             </div>
             <span class="badge bg-light text-dark px-3 py-2">
                 <i class="far fa-calendar-alt me-2"></i>{{ "now"|date("d/m/Y") }}
@@ -194,93 +160,220 @@
     <!-- Stats -->
     <div class="row g-4 mb-4">
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card primary animate-fade-in" style="animation-delay: 0.1s">
-                <div class="card-body position-relative">
-                    <div class="stats-icon"><i class="fas fa-users"></i></div>
-                    <div class="stats-number">{{ stats.total_users }}</div>
-                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Total Utilisateurs</div>
-                    <small>
-                        <i class="fas fa-arrow-{{ stats.growth_percentage >= 0 ? 'up' : 'down' }} me-1"></i>
-                        {{ stats.growth_percentage|abs }}% ce mois
-                    </small>
+            <div class="card dashboard-stat-card stat-card-purple">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                    <div class="stat-title">Événements à venir</div>
+                    <div class="stat-value">{{ stats.upcoming_events|default(0) }}</div>
+                    <a href="{{ path('app_event_index') }}" class="stat-button">Voir détails →</a>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card success animate-fade-in" style="animation-delay: 0.2s">
-                <div class="card-body position-relative">
-                    <div class="stats-icon"><i class="fas fa-user-check"></i></div>
-                    <div class="stats-number">{{ stats.active_users }}</div>
-                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Comptes Actifs</div>
-                    <small>
-                        <i class="fas fa-check-circle me-1"></i>
-                        {{ (stats.active_users / stats.total_users * 100)|round }}% du total
-                    </small>
+            <div class="card dashboard-stat-card stat-card-purple">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
+                    <div class="stat-title">Événements en cours</div>
+                    <div class="stat-value">{{ stats.ongoing_events|default(0) }}</div>
+                    <a href="{{ path('app_event_index') }}" class="stat-button">Voir détails →</a>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card warning animate-fade-in" style="animation-delay: 0.3s">
-                <div class="card-body position-relative">
-                    <div class="stats-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="stats-number">{{ stats.inactive_users }}</div>
-                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Comptes Inactifs</div>
-                    <small>
-                        <i class="fas fa-times-circle me-1"></i>
-                        {{ (stats.inactive_users / stats.total_users * 100)|round }}% du total
-                    </small>
+            <div class="card dashboard-stat-card stat-card-purple">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                    <div class="stat-title">Billets vendus aujourd'hui</div>
+                    <div class="stat-value">{{ stats.tickets_today|default(0) }}</div>
+                    <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card info animate-fade-in" style="animation-delay: 0.4s">
-                <div class="card-body position-relative">
-                    <div class="stats-icon"><i class="fas fa-user-plus"></i></div>
-                    <div class="stats-number">{{ stats.new_users_this_month }}</div>
-                    <div class="text-uppercase" style="font-size: 0.875rem; opacity: 0.9;">Nouveaux ce mois</div>
-                    <small>
-                        <i class="fas fa-calendar-alt me-1"></i>
-                        Depuis le {{ "first day of this month"|date("d/m/Y") }}
-                    </small>
+            <div class="card dashboard-stat-card stat-card-purple">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+                    <div class="stat-title">Revenus totaux</div>
+                    <div class="stat-value">{{ (stats.total_revenue|default(0))|number_format(2, ',', ' ') }} €</div>
+                    <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Stats Sponsoring -->
     <div class="row g-4 mb-4">
-        <div class="col-12"><h4><i class="fas fa-bolt me-2"></i>Actions Rapides</h4></div>
         <div class="col-xl-3 col-md-6">
-            <a href="{{ path('app_users_new') }}" class="quick-action-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="card-body text-center">
-                    <div class="quick-action-icon"><i class="fas fa-user-plus"></i></div>
-                    <h5 class="mb-0">Ajouter Utilisateur</h5>
+            <div class="card dashboard-stat-card stat-card-purple">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-handshake"></i></div>
+                    <div class="stat-title">Sponsors</div>
+                    <div class="stat-value">{{ stats.total_sponsors|default(0) }}</div>
+                    <a href="{{ path('app_sponsor_index') }}" class="stat-button">Voir détails →</a>
                 </div>
-            </a>
+            </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <a href="{{ path('app_users_index') }}" class="quick-action-card" style="background: linear-gradient(135deg, #0cebeb 0%, #20e3b2 100%);">
-                <div class="card-body text-center">
-                    <div class="quick-action-icon"><i class="fas fa-users"></i></div>
-                    <h5 class="mb-0">Gérer Utilisateurs</h5>
+            <div class="card dashboard-stat-card stat-card-green">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-file-contract"></i></div>
+                    <div class="stat-title">Contrats</div>
+                    <div class="stat-value">{{ stats.total_contracts|default(0) }}</div>
+                    <a href="{{ path('app_sponsor_contract_index') }}" class="stat-button">Voir détails →</a>
                 </div>
-            </a>
+            </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <a href="{{ path('app_users_index') }}" class="quick-action-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <div class="card-body text-center">
-                    <div class="quick-action-icon"><i class="fas fa-chart-bar"></i></div>
-                    <h5 class="mb-0">Rapports</h5>
+            <div class="card dashboard-stat-card stat-card-cyan">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-gift"></i></div>
+                    <div class="stat-title">Parrainages</div>
+                    <div class="stat-value">{{ stats.total_sponsorships|default(0) }}</div>
+                    <a href="{{ path('app_sponsorship_index') }}" class="stat-button">Voir détails →</a>
                 </div>
-            </a>
+            </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <a href="{{ path('app_dashboard') }}" class="quick-action-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <div class="card-body text-center">
-                    <div class="quick-action-icon"><i class="fas fa-cog"></i></div>
-                    <h5 class="mb-0">Paramètres</h5>
+            <div class="card dashboard-stat-card stat-card-yellow">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-title">Total</div>
+                    <div class="stat-value">{{ stats.total_sponsoring|default(0) }}</div>
+                    <div class="stat-subtitle">Éléments totaux</div>
                 </div>
-            </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Derniers Sponsors, Contrats et Parrainages -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-handshake me-2"></i>Derniers Sponsors</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_sponsors is not empty %}
+                        {% for sponsor in recent_sponsors %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <strong>{{ sponsor.name }}</strong><br>
+                                    <small class="text-muted">{{ sponsor.email }}</small>
+                                </div>
+                                <a href="{{ path('app_sponsor_show', {'id': sponsor.id}) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">Voir</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun sponsor</p>
+                    {% endif %}
+                    <a href="{{ path('app_sponsor_index') }}" class="btn w-100 mt-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">Voir tous les sponsors</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Derniers Contrats</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_contracts is not empty %}
+                        {% for contract in recent_contracts %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <strong>{{ contract.contractNumber }}</strong><br>
+                                    <small class="text-muted">{{ contract.sponsor.name }}</small>
+                                </div>
+                                <a href="{{ path('app_sponsor_contract_show', {'id': contract.id}) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">Voir</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun contrat</p>
+                    {% endif %}
+                    <a href="{{ path('app_sponsor_contract_index') }}" class="btn w-100 mt-3" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">Voir tous les contrats</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-gift me-2"></i>Derniers Parrainages</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_sponsorships is not empty %}
+                        {% for sponsorship in recent_sponsorships %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <strong>{{ sponsorship.sponsor.name }}</strong><br>
+                                    <small class="text-muted">{{ sponsorship.amount|number_format(2, ',', ' ') }} €</small>
+                                </div>
+                                <a href="{{ path('app_sponsorship_show', {'id': sponsorship.id}) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); color: white;">Voir</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun parrainage</p>
+                    {% endif %}
+                    <a href="{{ path('app_sponsorship_index') }}" class="btn w-100 mt-3" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); color: white;">Voir tous les parrainages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Derniers événements -->
+    <div class="card card-modern mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="fas fa-calendar-alt me-2"></i>Derniers événements</h5>
+            <a href="{{ path('app_event_index') }}" class="btn btn-sm btn-primary">Voir tout</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date</th>
+                            <th>Lieu</th>
+                            <th>Statut</th>
+                            <th>Places restantes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recent_events is not empty %}
+                            {% for event in recent_events %}
+                                <tr>
+                                    <td><strong>{{ event.title }}</strong></td>
+                                    <td>{{ event.startDate|date('d/m/Y H:i') }}</td>
+                                    <td>{{ event.location }}</td>
+                                    <td>
+                                        {% if event.startDate > now %}
+                                            <span class="badge bg-info">À venir</span>
+                                        {% elseif event.endDate >= now %}
+                                            <span class="badge bg-success">En cours</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Terminé</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ event.capacity - event.ticketsSold }}</td>
+                                    <td>
+                                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                    Aucun événement trouvé
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

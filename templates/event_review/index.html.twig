@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Avis{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-star"></i>
+                Gestion des Avis
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Avis</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_event_review_new') }}" class="btn btn-add">
+            <i class="fas fa-plus me-2"></i>Nouveau commentaire
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Événement</th>
+                        <th>Note</th>
+                        <th>Commentaire</th>
+                        <th>Date de création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for event_review in event_reviews %}
+                    <tr>
+                        <td>
+                            {% if event_review.event %}
+                                <a href="{{ path('app_event_show', {'id': event_review.event.id}) }}" class="text-primary">
+                                    {{ event_review.event.title }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for i in 1..5 %}
+                                {% if i <= event_review.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="ms-2">({{ event_review.rating }}/5)</span>
+                        </td>
+                        <td>{{ event_review.comment ? event_review.comment|slice(0, 50) ~ '...' : '-' }}</td>
+                        <td>{{ event_review.createdAt ? event_review.createdAt|date('d/m/Y H:i') : '' }}</td>
+                        <td>
+                            <a href="{{ path('app_event_review_show', {'id': event_review.id}) }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ path('app_event_review_edit', {'id': event_review.id}) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{{ path('app_event_review_delete', {'id': event_review.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet avis ?');" style="display: inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event_review.id) }}">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucun avis trouvé</p>
+                            <a href="{{ path('app_event_review_new') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Créer un avis
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

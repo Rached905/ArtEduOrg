@@ -1,0 +1,308 @@
+{% extends 'basec.html.twig' %}
+
+{% block title %}{{ event.title }} - ArtMarket{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="page-header mb-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="page-title">
+                        <i class="fas fa-calendar"></i>
+                        {{ event.title }}
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ path('app_client') }}">Accueil</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path('app_client_evenements') }}">Événements</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Détails</li>
+                        </ol>
+                    </nav>
+                </div>
+                <a href="{{ path('app_client_evenements') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
+        </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">{{ event.title }}</h1>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{{ event.description }}</p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Dates</h5>
+                            <p>{{ event.startDate|date('d/m/Y H:i') }} - {{ event.endDate ? event.endDate|date('d/m/Y H:i') : 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Lieu</h5>
+                            <p>{{ event.location }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Type</h5>
+                            <p><span class="badge badge-info">{{ event.type }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Prix</h5>
+                            <p>{{ event.price ? event.price ~ ' €' : 'Gratuit' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Capacité</h5>
+                            <p>{{ event.capacity }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Places restantes</h5>
+                            <p>{{ event.capacity - event.ticketsSold }}</p>
+                        </div>
+                    </div>
+
+                    {# Affichage des sponsors de l'événement #}
+                    {% set event_sponsors = get_event_sponsors(event) %}
+                    {% if event_sponsors|length > 0 %}
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h5>Sponsors de cet événement</h5>
+                                <div class="d-flex flex-wrap gap-3">
+                                    {% for sponsor in event_sponsors %}
+                                        {% if sponsor.logo %}
+                                            <a href="{{ sponsor.website ? sponsor.website : '#' }}" target="_blank" class="sponsor-logo-link" title="{{ sponsor.name }}">
+                                                <img src="{{ asset('uploads/sponsors/' ~ sponsor.logo) }}" alt="{{ sponsor.name }}" class="sponsor-logo" style="max-height: 60px; max-width: 150px; object-fit: contain;">
+                                            </a>
+                                        {% else %}
+                                            <span class="sponsor-name text-muted">{{ sponsor.name }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Acheter des billets</h5>
+                </div>
+                <div class="card-body">
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success">{{ message }}</div>
+                    {% endfor %}
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+
+                    {% set availableSeats = event.capacity - event.ticketsSold %}
+                    {% if availableSeats > 0 %}
+                        <form action="{{ path('app_ticket_purchase', {id: event.id})}}" method="post" id="ticketForm" onsubmit="return validateTicketForm({{ availableSeats }});" novalidate>
+                            <div class="form-group mb-3">
+                                <label for="buyer_name" class="form-label fw-bold">Nom <span class="text-danger">*</span></label>
+                                <input type="text" id="buyer_name" name="buyer_name" class="form-control" 
+                                       value="{{ app.user ? app.user.fullname : '' }}" required>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="buyer_email" class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+                                <input type="email" id="buyer_email" name="buyer_email" class="form-control" 
+                                       value="{{ app.user ? app.user.email : '' }}" required>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="quantity" class="form-label fw-bold">
+                                    Nombre de billets <span class="text-danger">*</span>
+                                    <small class="text-muted">(Places disponibles : {{ availableSeats }})</small>
+                                </label>
+                                <input type="number" id="quantity" name="quantity" 
+                                       class="form-control" 
+                                       min="1" 
+                                       max="{{ availableSeats }}" 
+                                       required>
+                                <div class="form-text">Nombre maximum de billets que vous pouvez acheter : {{ availableSeats }}</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-ticket-alt me-2"></i> Acheter les billets
+                                </button>
+                            </div>
+                            
+                            <div class="mt-3 text-muted small">
+                                <span class="text-danger">*</span> Champs obligatoires
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Désolé, cet événement est complet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Section des avis #}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-star"></i> Avis sur cet événement
+                        {% if averageRating > 0 %}
+                            <span class="badge bg-warning text-dark ms-2">{{ averageRating }}/5</span>
+                        {% endif %}
+                    </h5>
+                    <a href="{{ path('app_event_review_new_for_event', {'eventId': event.id}) }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-star me-2"></i>Créer un Avis
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if reviews|length > 0 %}
+                        {% for review in reviews %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <strong>{{ review.event.title }}</strong>
+                                        <div class="mt-1">
+                                            {% for i in 1..5 %}
+                                                {% if i <= review.rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-muted"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <span class="ms-2 text-muted">({{ review.rating }}/5)</span>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ review.createdAt|date('d/m/Y H:i') }}</small>
+                                </div>
+                                {% if review.comment %}
+                                    <p class="mb-0">{{ review.comment }}</p>
+                                {% else %}
+                                    <p class="text-muted mb-0"><em>Aucun commentaire</em></p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">
+                            <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                            Aucun avis pour cet événement. Soyez le premier à en laisser un !
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-gradient: linear-gradient(135deg, #e94560 0%, #d63850 100%);
+    --accent-color: #e94560;
+    --dark-color: #1a1a2e;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 20px;
+    border: none;
+}
+
+.card-header h1, .card-header h5 {
+    color: white;
+    margin: 0;
+}
+
+.badge-info {
+    background: var(--accent-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(233, 69, 96, 0.25);
+}
+
+.sponsor-logo {
+    max-height: 60px;
+    max-width: 150px;
+    object-fit: contain;
+    filter: grayscale(20%);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.sponsor-logo-link:hover .sponsor-logo {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.05);
+}
+</style>
+
+<script>
+function validateTicketForm(availableSeats) {
+    const quantity = parseInt(document.getElementById('quantity').value);
+    if (quantity > availableSeats) {
+        alert('Désolé, il ne reste que ' + availableSeats + ' place(s) disponible(s).');
+        return false;
+    }
+    if (quantity > 10) {
+        alert('Vous ne pouvez pas acheter plus de 10 billets à la fois.');
+        return false;
+    }
+    return true;
+}
+</script>
+{% endblock %}
+

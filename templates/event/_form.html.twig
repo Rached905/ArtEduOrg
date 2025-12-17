@@ -1,0 +1,126 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        {{ form_row(form.title, {
+            'attr': {'class': 'form-control', 'placeholder': 'Titre de l\'événement'},
+            'label': 'Titre',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        {{ form_row(form.type, {
+            'attr': {'class': 'form-control'},
+            'label': 'Type d\'événement',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-3">
+        {{ form_row(form.description, {
+            'attr': {'class': 'form-control', 'rows': '4', 'placeholder': 'Description détaillée de l\'événement'},
+            'label': 'Description',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        {{ form_row(form.startDate, {
+            'attr': {'class': 'form-control'},
+            'label': 'Date et heure de début',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        {{ form_row(form.endDate, {
+            'attr': {'class': 'form-control'},
+            'label': 'Date et heure de fin',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        {{ form_row(form.location, {
+            'attr': {'class': 'form-control', 'placeholder': 'Lieu de l\'événement', 'id': 'event_location'},
+            'label': 'Lieu',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        {{ form_row(form.capacity, {
+            'attr': {'class': 'form-control', 'min': '1'},
+            'label': 'Capacité',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        {{ form_row(form.price, {
+            'attr': {'class': 'form-control', 'step': '0.01', 'min': '0', 'placeholder': '0.00'},
+            'label': 'Prix (€)',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+
+<!-- Carte pour sélectionner l'emplacement -->
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <label class="form-label fw-bold">
+            <i class="fas fa-map-marker-alt me-2"></i>Localisation sur la carte
+        </label>
+        <div id="map" style="height: 400px; width: 100%; border-radius: 8px; border: 2px solid #e0e0e0;"></div>
+        <small class="form-text text-muted">
+            Cliquez sur la carte pour sélectionner l'emplacement de l'événement
+        </small>
+    </div>
+</div>
+
+{% if form.status is defined %}
+<div class="row">
+    <div class="col-md-12 mb-3">
+        {{ form_row(form.status, {
+            'attr': {'class': 'form-select'},
+            'label': 'Statut',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+{% endif %}
+
+{% if form.sponsors is defined %}
+<div class="row">
+    <div class="col-md-12 mb-3">
+        {{ form_row(form.sponsors, {
+            'attr': {'class': 'form-select'},
+            'label': 'Sponsors',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+{% endif %}
+
+{{ form_row(form.latitude, {'attr': {'id': 'event_latitude'}}) }}
+{{ form_row(form.longitude, {'attr': {'id': 'event_longitude'}}) }}
+{{ form_row(form.address, {'attr': {'id': 'event_address'}}) }}
+
+<div class="d-flex justify-content-end gap-2 mt-4">
+    <a href="{{ path('app_event_admin_index') }}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Annuler
+    </a>
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+</div>
+
+{{ form_end(form) }}
+

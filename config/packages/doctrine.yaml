@@ -1,10 +1,12 @@
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
+        # Force l'utilisation de la base de données artedu2
+        url: 'mysql://root:@127.0.0.1:3306/artedu2?serverVersion=8.0.32&charset=utf8mb4'
+        # url: '%env(resolve:DATABASE_URL)%'  # Désactivé pour forcer artedu2
 
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '16'
+        server_version: '8.0.32'
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true

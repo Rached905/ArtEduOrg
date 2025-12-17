@@ -652,11 +652,11 @@
 
             <div class="sidebar-section">
                 <h6 class="sidebar-heading">Événements</h6>
-                <a href="#" class="sidebar-link">
+                <a href="{{ path('app_client_evenements') }}" class="sidebar-link {{ app.request.attributes.get('_route') == 'app_client_evenements' or app.request.attributes.get('_route') == 'app_event_show' ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
                     <span> Tous les Événements</span>
                 </a>
-                <a href="#" class="sidebar-link">
+                <a href="{{ path('app_client_favoris') }}" class="sidebar-link {{ app.request.attributes.get('_route') == 'app_client_favoris' ? 'active' : '' }}">
                     <i class="fas fa-star"></i>
                     <span> Événements Favoris</span>
                 </a>
@@ -672,13 +672,9 @@
 
             <div class="sidebar-section">
                 <h6 class="sidebar-heading">Transactions</h6>
-                <a href="#" class="sidebar-link">
+                <a href="{{ path('app_client_mes_achats') }}" class="sidebar-link {{ app.request.attributes.get('_route') == 'app_client_mes_achats' ? 'active' : '' }}">
                     <i class="fas fa-shopping-cart"></i>
                     <span> Mes Achats</span>
-                </a>
-                <a href="#" class="sidebar-link">
-                    <i class="fas fa-cash-register"></i>
-                    <span> Mes Ventes</span>
                 </a>
             </div>
 

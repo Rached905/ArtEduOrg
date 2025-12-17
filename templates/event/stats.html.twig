@@ -1,0 +1,268 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des Événements{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stats-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card.blue .stat-card-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .stat-card.green .stat-card-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .stat-card.orange .stat-card-icon { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+    .stat-card.purple .stat-card-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+    .stat-card.red .stat-card-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .stat-card.yellow .stat-card-icon { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .card-modern {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-modern .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 2px solid #e9ecef;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+    }
+
+    .event-item {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+
+    .event-item:hover {
+        background: #f8f9fa;
+    }
+
+    .event-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="stats-header mt-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1><i class="fas fa-calendar-alt me-2"></i>Statistiques des Événements</h1>
+                <p class="mb-0">Vue d'ensemble complète de tous vos événements</p>
+            </div>
+            <span class="badge bg-light text-dark px-3 py-2">
+                <i class="far fa-calendar-alt me-2"></i>{{ "now"|date("d/m/Y") }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card blue">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-value">{{ total_events }}</div>
+                    <div class="stat-label">Total des Événements</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card green">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value">{{ stats_by_status.programme }}</div>
+                    <div class="stat-label">Programmés</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card orange">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ stats_by_status.en_cours }}</div>
+                    <div class="stat-label">En Cours</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card purple">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ stats_by_status.termine }}</div>
+                    <div class="stat-label">Terminés</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques supplémentaires -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card red">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ stats_by_status.annule }}</div>
+                    <div class="stat-label">Annulés</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card blue">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <div class="stat-value">{{ upcoming }}</div>
+                    <div class="stat-label">À Venir</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card yellow">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value">{{ total_reviews }}</div>
+                    <div class="stat-label">Total des Avis</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card green">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ average_rating|number_format(1) }}</div>
+                    <div class="stat-label">Note Moyenne</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top événements et événements récents -->
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-trophy me-2"></i>Top 5 Événements (Tickets Vendus)
+                </div>
+                <div class="card-body">
+                    {% if top_events|length > 0 %}
+                        {% for item in top_events %}
+                            <div class="event-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ item.event.title }}</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-ticket-alt me-1"></i>{{ item.tickets_sold }} tickets vendus
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong class="text-success">{{ (item.revenue)|number_format(2, ',', ' ') }} €</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun événement avec des tickets vendus</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-clock me-2"></i>Événements Récents
+                </div>
+                <div class="card-body">
+                    {% if recent_events|length > 0 %}
+                        {% for event in recent_events %}
+                            <div class="event-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ event.title }}</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {% if event.startDate %}
+                                                {{ event.startDate|date('d/m/Y H:i') }}
+                                            {% else %}
+                                                Date non définie
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-{{ event.status.value == 'PROGRAMME' ? 'info' : (event.status.value == 'EN_COURS' ? 'success' : (event.status.value == 'TERMINE' ? 'secondary' : 'danger')) }}">
+                                            {{ event.status.value }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun événement récent</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

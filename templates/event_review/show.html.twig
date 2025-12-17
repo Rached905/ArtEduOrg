@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'avis{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-star"></i>
+                Détails de l'avis
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_event_review_index') }}">Avis</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Détails</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_event_review_index') }}" class="btn btn-reset">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <th width="200">Événement</th>
+                    <td>
+                        {% if event_review.event %}
+                            <a href="{{ path('app_event_show', {'id': event_review.event.id}) }}" class="text-primary">
+                                <i class="fas fa-calendar"></i> {{ event_review.event.title }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Note</th>
+                    <td>
+                        {% for i in 1..5 %}
+                            {% if i <= event_review.rating %}
+                                <i class="fas fa-star text-warning" style="font-size: 1.5rem;"></i>
+                            {% else %}
+                                <i class="far fa-star text-muted" style="font-size: 1.5rem;"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 fw-bold">({{ event_review.rating }}/5)</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Commentaire</th>
+                    <td>{{ event_review.comment ?: '<span class="text-muted">Aucun commentaire</span>' }}</td>
+                </tr>
+                <tr>
+                    <th>Date de création</th>
+                    <td>{{ event_review.createdAt ? event_review.createdAt|date('d/m/Y à H:i') : '' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ path('app_event_review_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('app_event_review_edit', {'id': event_review.id}) }}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Modifier
+    </a>
+    {{ include('event_review/_delete_form.html.twig') }}
+</div>
+{% endblock %}
+
+

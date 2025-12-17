@@ -3,8 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Users;
+use App\Entity\Enum\EventStatus;
 use App\Enum\Role;
 use App\Repository\UsersRepository;
+use App\Repository\EventRepository;
+use App\Repository\TicketRepository;
+use App\Repository\SponsorRepository;
+use App\Repository\SponsorContractRepository;
+use App\Repository\SponsorshipRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,7 +18,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_dashboard')]
-    public function index(UsersRepository $usersRepository): Response
+    public function index(
+        UsersRepository $usersRepository,
+        EventRepository $eventRepository,
+        TicketRepository $ticketRepository,
+        SponsorRepository $sponsorRepository,
+        SponsorContractRepository $sponsorContractRepository,
+        SponsorshipRepository $sponsorshipRepository
+    ): Response
     {
         // Récupérer tous les utilisateurs
         $allUsers = $usersRepository->findAll();
@@ -56,6 +69,46 @@ class DashboardController extends AbstractController
         // Données pour le graphique (7 derniers jours)
         $chartData = $this->getChartData($usersRepository);
         
+        // Statistiques des événements
+        $now = new \DateTimeImmutable();
+        $allEvents = $eventRepository->findAll();
+        
+        $upcomingEvents = count(array_filter($allEvents, function($e) use ($now) {
+            return $e->getStartDate() > $now;
+        }));
+        
+        $ongoingEvents = count(array_filter($allEvents, function($e) use ($now) {
+            return $e->getStartDate() <= $now && $e->getEndDate() >= $now;
+        }));
+        
+        // Statistiques des tickets
+        $allTickets = $ticketRepository->findAll();
+        $startOfDay = $now->setTime(0, 0, 0);
+        $endOfDay = $now->setTime(23, 59, 59);
+        
+        $ticketsToday = count(array_filter($allTickets, function($t) use ($startOfDay, $endOfDay) {
+            $issuedAt = $t->getIssuedAt();
+            return $issuedAt >= $startOfDay && $issuedAt <= $endOfDay;
+        }));
+        
+        $totalRevenue = array_sum(array_map(function($t) {
+            return ($t->getPrice() ?? 0) * ($t->getQuantity() ?? 1);
+        }, $allTickets));
+        
+        // Derniers événements
+        $recentEvents = $eventRepository->findBy([], ['startDate' => 'DESC'], 10);
+        
+        // Statistiques des sponsors
+        $totalSponsors = $sponsorRepository->count([]);
+        $totalContracts = $sponsorContractRepository->count([]);
+        $totalSponsorships = $sponsorshipRepository->count([]);
+        $totalSponsoring = $totalSponsors + $totalContracts + $totalSponsorships;
+        
+        // Derniers sponsors, contrats et parrainages
+        $recentSponsors = $sponsorRepository->findBy([], ['id' => 'DESC'], 2);
+        $recentContracts = $sponsorContractRepository->findRecentWithSponsor(1);
+        $recentSponsorships = $sponsorshipRepository->findRecentWithSponsor(1);
+        
         return $this->render('dashboard/index.html.twig', [
             'stats' => [
                 'total_users' => $totalUsers,
@@ -66,10 +119,23 @@ class DashboardController extends AbstractController
                 'admin_count' => $adminCount,
                 'vendor_count' => $vendorCount,
                 'client_count' => $clientCount,
+                'upcoming_events' => $upcomingEvents,
+                'ongoing_events' => $ongoingEvents,
+                'tickets_today' => $ticketsToday,
+                'total_revenue' => $totalRevenue,
+                'total_sponsors' => $totalSponsors,
+                'total_contracts' => $totalContracts,
+                'total_sponsorships' => $totalSponsorships,
+                'total_sponsoring' => $totalSponsoring,
             ],
             'recent_users' => $recentUsers,
             'recent_activities' => $recentActivities,
             'chart_data' => $chartData,
+            'recent_events' => $recentEvents,
+            'recent_sponsors' => $recentSponsors,
+            'recent_contracts' => $recentContracts,
+            'recent_sponsorships' => $recentSponsorships,
+            'now' => $now,
         ]);
     }
     

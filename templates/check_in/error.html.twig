@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur Check-in{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="alert alert-danger text-center">
+        <i class="fas fa-exclamation-circle fa-4x mb-3"></i>
+        <h2>Erreur</h2>
+        <p class="lead">{{ message }}</p>
+    </div>
+</div>
+{% endblock %}
+
+

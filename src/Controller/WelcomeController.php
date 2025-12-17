@@ -15,6 +15,12 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 
 final class WelcomeController extends AbstractController
 {
+    #[Route('/', name: 'app_home')]
+    public function home(): Response
+    {
+        return $this->redirectToRoute('app_welcome');
+    }
+
     #[Route('/welcome', name: 'app_welcome')]
     public function index(): Response
     {

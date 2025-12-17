@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Événements{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                Dashboard Événements
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard Événements</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Cartes statistiques Événements -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-purple">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                <div class="stat-title">Total événements</div>
+                <div class="stat-value">{{ eventStats.total|default(0) }}</div>
+                <a href="{{ path('app_event_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-green">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-calendar-clock"></i></div>
+                <div class="stat-title">À venir</div>
+                <div class="stat-value">{{ eventStats.upcoming|default(0) }}</div>
+                <a href="{{ path('app_event_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-cyan">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
+                <div class="stat-title">En cours</div>
+                <div class="stat-value">{{ eventStats.ongoing|default(0) }}</div>
+                <a href="{{ path('app_event_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-yellow">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-title">Terminés</div>
+                <div class="stat-value">{{ eventStats.past|default(0) }}</div>
+                <a href="{{ path('app_event_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cartes statistiques Tickets -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-4 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-purple">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                <div class="stat-title">Total tickets</div>
+                <div class="stat-value">{{ ticketStats.total|default(0) }}</div>
+                <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-green">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                <div class="stat-title">Tickets aujourd'hui</div>
+                <div class="stat-value">{{ ticketStats.today|default(0) }}</div>
+                <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-yellow">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+                <div class="stat-title">Revenus totaux</div>
+                <div class="stat-value">{{ (ticketStats.revenue|default(0))|number_format(0, ',', ' ') }} €</div>
+                <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des événements récents -->
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Événements récents</h4>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Date début</th>
+                        <th>Lieu</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events|slice(0, 5) %}
+                    <tr>
+                        <td><strong>{{ event.title }}</strong></td>
+                        <td>{{ event.startDate|date('d/m/Y H:i') }}</td>
+                        <td>{{ event.location }}</td>
+                        <td>
+                            {% if event.startDate > now %}
+                                <span class="badge bg-info">À venir</span>
+                            {% elseif event.endDate >= now %}
+                                <span class="badge bg-success">En cours</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Terminé</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ path('app_event_show', {id: event.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted">Aucun événement</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

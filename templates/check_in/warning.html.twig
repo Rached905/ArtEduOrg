@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Attention Check-in{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="alert alert-warning text-center">
+        <i class="fas fa-exclamation-triangle fa-4x mb-3"></i>
+        <h2>Attention</h2>
+        <p class="lead">{{ message }}</p>
+        <hr>
+        <p>
+            <strong>Participant :</strong> {{ ticket.buyerName }}<br>
+            <strong>Événement :</strong> {{ ticket.event.title }}
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+

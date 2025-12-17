@@ -1,0 +1,262 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des Ventes{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stats-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card.green .stat-card-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .stat-card.blue .stat-card-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .stat-card.purple .stat-card-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+    .stat-card.orange .stat-card-icon { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .card-modern {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-modern .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 2px solid #e9ecef;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+    }
+
+    .ticket-item {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+
+    .ticket-item:hover {
+        background: #f8f9fa;
+    }
+
+    .ticket-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="stats-header mt-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1><i class="fas fa-shopping-cart me-2"></i>Statistiques des Ventes</h1>
+                <p class="mb-0">Analyse complète de vos ventes de tickets</p>
+            </div>
+            <span class="badge bg-light text-dark px-3 py-2">
+                <i class="far fa-calendar-alt me-2"></i>{{ "now"|date("d/m/Y") }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card green">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ total_tickets }}</div>
+                    <div class="stat-label">Total des Tickets</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card blue">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-value">{{ tickets_today }}</div>
+                    <div class="stat-label">Tickets Aujourd'hui</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card purple">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="stat-value">{{ tickets_this_week }}</div>
+                    <div class="stat-label">Tickets Cette Semaine</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card orange">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ tickets_this_month }}</div>
+                    <div class="stat-label">Tickets Ce Mois</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques de revenus -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card green">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="stat-value">{{ (total_revenue)|number_format(2, ',', ' ') }} €</div>
+                    <div class="stat-label">Revenus Totaux</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card blue">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-value">{{ (revenue_today)|number_format(2, ',', ' ') }} €</div>
+                    <div class="stat-label">Revenus Aujourd'hui</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card purple">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-value">{{ (revenue_this_week)|number_format(2, ',', ' ') }} €</div>
+                    <div class="stat-label">Revenus Cette Semaine</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card orange">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-value">{{ (revenue_this_month)|number_format(2, ',', ' ') }} €</div>
+                    <div class="stat-label">Revenus Ce Mois</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top événements et tickets récents -->
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-trophy me-2"></i>Top 5 Événements (Revenus)
+                </div>
+                <div class="card-body">
+                    {% if top_events|length > 0 %}
+                        {% for item in top_events %}
+                            <div class="ticket-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ item.event.title }}</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-ticket-alt me-1"></i>{{ item.tickets_count }} tickets
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong class="text-success">{{ (item.revenue)|number_format(2, ',', ' ') }} €</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun événement avec des ventes</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-clock me-2"></i>Derniers Tickets Vendus
+                </div>
+                <div class="card-body">
+                    {% if recent_tickets|length > 0 %}
+                        {% for ticket in recent_tickets %}
+                            <div class="ticket-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ ticket.buyerName }}</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>{{ ticket.issuedAt|date('d/m/Y H:i') }}
+                                            {% if ticket.event %}
+                                                <br><i class="fas fa-calendar-alt me-1"></i>{{ ticket.event.title }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong class="text-success">{{ ((ticket.price ?? 0) * (ticket.quantity ?? 1))|number_format(2, ',', ' ') }} €</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun ticket vendu</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

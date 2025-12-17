@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Sponsor{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-user-circle"></i>
+                Détails du Sponsor
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_sponsor_index') }}">Sponsors</a></li>
+                    <li class="breadcrumb-item active">{{ sponsor.name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_sponsor_index') }}" class="btn btn-reset">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <th width="200">Nom</th>
+                    <td><strong>{{ sponsor.name }}</strong></td>
+                </tr>
+                {% if sponsor.logo %}
+                <tr>
+                    <th>Logo</th>
+                    <td>
+                        <img src="{{ asset('uploads/sponsors/' ~ sponsor.logo) }}" 
+                             alt="Logo {{ sponsor.name }}" 
+                             class="img-fluid" 
+                             style="max-height: 150px; max-width: 300px;">
+                    </td>
+                </tr>
+                {% endif %}
+                {% if sponsor.website %}
+                <tr>
+                    <th>Site web</th>
+                    <td><a href="{{ sponsor.website }}" target="_blank">{{ sponsor.website }}</a></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Email</th>
+                    <td>{{ sponsor.email }}</td>
+                </tr>
+                <tr>
+                    <th>Téléphone</th>
+                    <td>{{ sponsor.phone }}</td>
+                </tr>
+                <tr>
+                    <th>Type</th>
+                    <td><span class="badge bg-secondary">{{ sponsor.type.value }}</span></td>
+                </tr>
+                {% if sponsor.events|length > 0 %}
+                <tr>
+                    <th>Événements associés</th>
+                    <td>
+                        <ul class="list-unstyled mb-0">
+                            {% for event in sponsor.events %}
+                                <li>
+                                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="text-decoration-none">
+                                        <i class="fas fa-calendar"></i> {{ event.title }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <th>Type de sponsorisation</th>
+                    <td><span class="badge bg-info">Sponsor de plateforme</span></td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ path('app_sponsor_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('app_sponsor_edit', {'id': sponsor.id}) }}" class="btn btn-warning">Modifier</a>
+    {{ include('sponsor/_delete_form.html.twig') }}
+</div>
+{% endblock %}
+
+

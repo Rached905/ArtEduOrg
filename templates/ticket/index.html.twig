@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Ventes{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-shopping-cart"></i>
+                Gestion des Ventes
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Ventes</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_ticket_new') }}" class="btn btn-add btn-ticket-create">
+            <i class="fas fa-ticket-alt me-2"></i>Créer un Ticket
+        </a>
+    </div>
+</div>
+
+<!-- Cartes Statistiques -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-purple">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                <div class="stat-title">Total tickets</div>
+                <div class="stat-value">{{ tickets|length|default(0) }}</div>
+                <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-green">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                <div class="stat-title">Tickets aujourd'hui</div>
+                <div class="stat-value">{{ tickets_today|default(0) }}</div>
+                <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-cyan">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+                <div class="stat-title">Revenus totaux</div>
+                <div class="stat-value">{{ (total_revenue|default(0))|number_format(0, ',', ' ') }} €</div>
+                <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-yellow">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="stat-title">Revenus aujourd'hui</div>
+                <div class="stat-value">{{ (revenue_today|default(0))|number_format(0, ',', ' ') }} €</div>
+                <a href="{{ path('app_ticket_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Derniers billets vendus -->
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-ticket-alt me-2"></i>Derniers billets vendus</h5>
+        <a href="{{ path('app_ticket_index') }}" class="btn btn-sm btn-primary">Voir tout</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Événement</th>
+                        <th>Acheteur</th>
+                        <th>Date d'achat</th>
+                        <th>Prix</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if tickets is not empty %}
+                        {% for ticket in tickets|slice(0, 5) %}
+                            <tr>
+                                <td>
+                                    {% if ticket.event %}
+                                        <strong>{{ ticket.event.title }}</strong>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ticket.buyerName }}</td>
+                                <td>{{ ticket.issuedAt ? ticket.issuedAt|date('d/m/Y H:i') : 'N/A' }}</td>
+                                <td><strong>{{ ticket.price ? ticket.price|number_format(2, ',', ' ') ~ ' €' : 'Gratuit' }}</strong></td>
+                                <td>
+                                    <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                Aucun billet trouvé
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Tableau des tickets -->
+<div class="stat-card mt-4">
+    <h5 class="mb-4"><i class="fas fa-list"></i> Liste des tickets</h5>
+    <div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Événement</th>
+                        <th>Acheteur</th>
+                        <th>Email</th>
+                        <th>Prix</th>
+                        <th>Quantité</th>
+                        <th>Siège</th>
+                        <th>Date d'émission</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                        <tr>
+                            <td>
+                                {% if ticket.event %}
+                                    <a href="{{ path('app_event_show', {'id': ticket.event.id}) }}" class="text-primary">
+                                        {{ ticket.event.title }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ticket.buyerName }}</td>
+                            <td>{{ ticket.buyerEmail }}</td>
+                            <td><strong>{{ ticket.price ? ticket.price|number_format(2, ',', ' ') ~ ' €' : 'Gratuit' }}</strong></td>
+                            <td><span class="badge badge-info">{{ ticket.quantity }}</span></td>
+                            <td>{{ ticket.seatNumber ? ticket.seatNumber : '-' }}</td>
+                            <td>{{ ticket.issuedAt ? ticket.issuedAt|date('d/m/Y H:i') : 'N/A' }}</td>
+                            <td>
+                                <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_ticket_delete', {'id': ticket.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce ticket ?');" style="display: inline-block;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ticket.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Aucun ticket trouvé</p>
+                                <a href="{{ path('app_ticket_new') }}" class="btn btn-ticket-create">
+                                    <i class="fas fa-ticket-alt me-2"></i>Créer un Ticket
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

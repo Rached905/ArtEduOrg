@@ -1,0 +1,204 @@
+{% if app.user and app.user.role and (app.user.role.value == 'CLIENT' or app.user.role.value == 'AGENT') %}
+    {% extends 'basec.html.twig' %}
+{% else %}
+    {% extends 'base.html.twig' %}
+{% endif %}
+
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
+
+{% block body %}
+<style>
+.ticket-container {
+    max-width: 380px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+.ticket-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 3px dashed rgba(255,255,255,0.3);
+}
+
+.ticket-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.ticket-body {
+    padding: 20px;
+    text-align: center;
+}
+
+.qr-box {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 15px;
+    display: inline-block;
+    margin-bottom: 20px;
+    border: 2px solid #e9ecef;
+}
+
+.qr-container svg {
+    width: 180px;
+    height: 180px;
+    display: block;
+    margin: 0 auto;
+}
+
+.ticket-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.ticket-label {
+    color: #6c757d;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ticket-value {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1.05rem;
+}
+
+.ticket-footer {
+    background: #f8f9fa;
+    padding: 15px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.badge-seat {
+    background: #e2e8f0;
+    color: #2d3748;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.admin-controls {
+    margin-top: 20px;
+    text-align: center;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+.admin-controls:hover {
+    opacity: 1;
+}
+</style>
+
+<div class="ticket-container">
+    <!-- HEADER -->
+    <div class="ticket-header">
+        <h2>{{ ticket.event ? ticket.event.title : 'Ticket' }}</h2>
+        <p class="mb-0 small">
+            {{ ticket.event and ticket.event.startDate ? ticket.event.startDate|date('d/m/Y H:i') : 'Date N/A' }}
+        </p>
+    </div>
+
+    <!-- BODY -->
+    <div class="ticket-body">
+        <div class="qr-box">
+            <div class="qr-container">
+                {{ qrSvg|raw }}
+            </div>
+        </div>
+
+        <div class="ticket-info-row">
+            <div>
+                <div class="ticket-label">Invité</div>
+                <div class="ticket-value">{{ ticket.buyerName }}</div>
+            </div>
+            <div class="text-end">
+                <div class="ticket-label">Siège</div>
+                <div class="ticket-value">
+                    {% if ticket.seatNumber %}
+                        <span class="badge-seat">{{ ticket.seatNumber }}</span>
+                    {% else %}
+                        Admission générale
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="ticket-info-row">
+            <div>
+                <div class="ticket-label">Prix</div>
+                <div class="ticket-value">{{ ticket.price }} €</div>
+            </div>
+            <div class="text-end">
+                <div class="ticket-label">Quantité</div>
+                <div class="ticket-value">{{ ticket.quantity }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="ticket-footer">
+        <a href="{{ qrCodeTargetUrl }}" class="btn btn-primary btn-sm rounded-pill">
+            <i class="fas fa-check-circle"></i> Check-in Scanner
+        </a>
+    </div>
+</div>
+
+<!-- ADMIN CONTROLS -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-ticket-alt"></i>
+                Détails du ticket
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_ticket_index') }}">Ventes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Détails</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="admin-controls">
+    {% if is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('app_ticket_index') }}" class="btn btn-reset">
+        <i class="fas fa-arrow-left me-2"></i>Retour
+    </a>
+    {% else %}
+    <a href="{{ path('app_client_mes_achats') }}" class="btn btn-reset">
+        <i class="fas fa-arrow-left me-2"></i>Retour à mes achats
+    </a>
+    {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}" class="btn btn-add">
+        <i class="fas fa-edit me-2"></i>Modifier
+    </a>
+    <form method="post"
+          action="{{ path('app_ticket_delete', {'id': ticket.id}) }}"
+          style="display:inline"
+          onsubmit="return confirm('Supprimer ce ticket ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ticket.id) }}">
+        <button class="btn btn-reset" style="background: #e74c3c; color: white;">Supprimer</button>
+    </form>
+    {% else %}
+    <a href="{{ path('app_client_mes_achats') }}" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-2"></i>Retour à mes achats
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
+
+

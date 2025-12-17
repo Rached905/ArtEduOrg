@@ -1,3 +1,6 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        # Pour les tests sans serveur SMTP, utilisez: null://null
+        # Pour Mailpit (Docker): smtp://mailer:1025
+        # Pour Gmail: smtp://gmail.com:587?encryption=tls&auth_mode=login&username=USERNAME&password=PASSWORD

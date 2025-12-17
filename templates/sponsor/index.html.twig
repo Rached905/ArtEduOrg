@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Sponsors{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-users-cog"></i>
+                Gestion des Sponsors
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Sponsors</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_sponsor_new') }}" class="btn btn-add">
+            <i class="fas fa-plus me-2"></i>Ajouter un sponsor
+        </a>
+    </div>
+</div>
+
+<!-- Cartes Statistiques -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-purple">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-handshake"></i></div>
+                <div class="stat-title">Sponsors</div>
+                <div class="stat-value">{{ stats.total_sponsors|default(0) }}</div>
+                <a href="{{ path('app_sponsor_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-green">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="stat-title">Contrats</div>
+                <div class="stat-value">{{ stats.total_contracts|default(0) }}</div>
+                <a href="{{ path('app_sponsor_contract_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-cyan">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-gift"></i></div>
+                <div class="stat-title">Parrainages</div>
+                <div class="stat-value">{{ stats.total_sponsorships|default(0) }}</div>
+                <a href="{{ path('app_sponsorship_index') }}" class="stat-button">Voir détails →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="card dashboard-stat-card stat-card-yellow">
+            <div class="card-body">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-title">Total</div>
+                <div class="stat-value">{{ stats.total_sponsoring|default(0) }}</div>
+                <div class="stat-subtitle">Éléments totaux</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Derniers éléments -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="mb-0"><i class="fas fa-handshake me-2"></i>Derniers Sponsors</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_sponsors is not empty %}
+                    {% for sponsor in recent_sponsors %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <strong>{{ sponsor.name }}</strong><br>
+                                <small class="text-muted">{{ sponsor.email }}</small>
+                            </div>
+                            <a href="{{ path('app_sponsor_show', {'id': sponsor.id}) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">Voir</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">Aucun sponsor</p>
+                {% endif %}
+                <a href="{{ path('app_sponsor_index') }}" class="btn w-100 mt-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">Voir tous les sponsors</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
+                <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Derniers Contrats</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_contracts is not empty %}
+                    {% for contract in recent_contracts %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <strong>{{ contract.contractNumber }}</strong><br>
+                                <small class="text-muted">{{ contract.sponsor.name }}</small>
+                            </div>
+                            <a href="{{ path('app_sponsor_contract_show', {'id': contract.id}) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">Voir</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">Aucun contrat</p>
+                {% endif %}
+                <a href="{{ path('app_sponsor_contract_index') }}" class="btn w-100 mt-3" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">Voir tous les contrats</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); color: white;">
+                <h5 class="mb-0"><i class="fas fa-gift me-2"></i>Derniers Parrainages</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_sponsorships is not empty %}
+                    {% for sponsorship in recent_sponsorships %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <strong>{{ sponsorship.sponsor.name }}</strong><br>
+                                <small class="text-muted">{{ sponsorship.amount|number_format(2, ',', ' ') }} €</small>
+                            </div>
+                            <a href="{{ path('app_sponsorship_show', {'id': sponsorship.id}) }}" class="btn btn-sm" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); color: white;">Voir</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">Aucun parrainage</p>
+                {% endif %}
+                <a href="{{ path('app_sponsorship_index') }}" class="btn w-100 mt-3" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); color: white;">Voir tous les parrainages</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if sponsors|length > 0 %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Logo</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for sponsor in sponsors %}
+                        <tr>
+                            <td>
+                                {% if sponsor.logo %}
+                                    <img src="{{ asset('uploads/sponsors/' ~ sponsor.logo) }}" 
+                                         alt="Logo {{ sponsor.name }}"
+                                         style="max-height: 50px; max-width: 100px; object-fit: contain;">
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ sponsor.name }}</strong></td>
+                            <td>
+                                <i class="fas fa-envelope"></i> 
+                                {{ sponsor.email }}
+                            </td>
+                            <td>
+                                <i class="fas fa-phone"></i> 
+                                {{ sponsor.phone }}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ sponsor.type.value }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ path('app_sponsor_show', {'id': sponsor.id}) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <a href="{{ path('app_sponsor_edit', {'id': sponsor.id}) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body">
+            <div class="alert alert-info">
+                <p class="mb-0">Aucun sponsor trouvé. <a href="{{ path('app_sponsor_new') }}">Créer le premier sponsor</a></p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+

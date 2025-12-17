@@ -1,0 +1,146 @@
+{% extends 'basec.html.twig' %}
+
+{% block title %}Mes Achats - ArtMarket{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="page-header mb-5">
+            <h1 class="page-title">
+                <i class="fas fa-shopping-cart"></i>
+                Mes Achats
+            </h1>
+            <p class="text-muted">Consultez tous vos tickets achetés</p>
+        </div>
+
+        {% if tickets|length > 0 %}
+        <div class="row g-4">
+            {% for ticket in tickets %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card ticket-card">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-ticket-alt"></i> Ticket #{{ ticket.id }}
+                            </h5>
+                            <span class="badge bg-light text-dark">{{ ticket.event.title }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="ticket-info">
+                            <div class="info-item">
+                                <i class="fas fa-calendar text-primary"></i>
+                                <div>
+                                    <strong>Date d'achat:</strong>
+                                    <p class="mb-0">{{ ticket.issuedAt|date('d/m/Y H:i') }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-user text-primary"></i>
+                                <div>
+                                    <strong>Acheteur:</strong>
+                                    <p class="mb-0">{{ ticket.buyerName }}</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-euro-sign text-primary"></i>
+                                <div>
+                                    <strong>Prix:</strong>
+                                    <p class="mb-0">{{ ticket.price|number_format(2, ',', ' ') }} €</p>
+                                </div>
+                            </div>
+                            {% if ticket.seatNumber %}
+                            <div class="info-item">
+                                <i class="fas fa-chair text-primary"></i>
+                                <div>
+                                    <strong>Siège:</strong>
+                                    <p class="mb-0">#{{ ticket.seatNumber }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <a href="{{ path('app_ticket_show', {id: ticket.id}) }}" class="btn btn-primary w-100">
+                            <i class="fas fa-eye"></i> Voir le QR Code
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+            <h3 class="text-muted">Aucun achat pour le moment</h3>
+            <p class="text-muted">Commencez à explorer les événements et achetez vos premiers tickets !</p>
+            <a href="{{ path('app_client_evenements') }}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-calendar-alt"></i> Voir les événements
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-color: #e94560;
+    --dark-color: #1a1a2e;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.ticket-card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: none;
+    overflow: hidden;
+}
+
+.ticket-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.2);
+}
+
+.ticket-card .card-header {
+    border-radius: 0;
+    padding: 20px;
+}
+
+.ticket-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.info-item i {
+    font-size: 1.5rem;
+    margin-top: 5px;
+}
+
+.info-item strong {
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.info-item p {
+    color: #666;
+    margin: 0;
+}
+</style>
+{% endblock %}
+

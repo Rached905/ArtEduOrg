@@ -42,6 +42,42 @@ security:
         - { path: ^/connect/google, roles: PUBLIC_ACCESS }
         - { path: ^/choose-role, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/set-role, roles: IS_AUTHENTICATED_FULLY }
+        # Accès public pour créer (new) - routes spécifiques en premier pour éviter les conflits
+        - { path: ^/event/new, roles: PUBLIC_ACCESS }
+        - { path: ^/ticket/new, roles: PUBLIC_ACCESS }
+        - { path: ^/sponsor/new, roles: PUBLIC_ACCESS }
+        - { path: ^/sponsor/contract/new, roles: PUBLIC_ACCESS }
+        - { path: ^/sponsorship/new, roles: PUBLIC_ACCESS }
+        # Accès public pour consulter les événements et acheter des tickets
+        - { path: ^/event/, roles: PUBLIC_ACCESS }
+        - { path: ^/event/review/, roles: PUBLIC_ACCESS }
+        - { path: ^/ticket/scan/, roles: PUBLIC_ACCESS }
+        - { path: ^/check-in/, roles: PUBLIC_ACCESS }
+        # Accès public pour les pages client
+        - { path: ^/client, roles: PUBLIC_ACCESS }
+        # Accès public pour consulter les sponsors (lecture seule)
+        - { path: ^/sponsor/?$, roles: PUBLIC_ACCESS }
+        - { path: ^/sponsor/[0-9]+/?$, roles: PUBLIC_ACCESS }
+        # Accès admin pour la gestion
+        - { path: ^/event/admin, roles: ROLE_ADMIN }
+        # Accès admin pour modifier et supprimer
+        - { path: ^/event/[0-9]+/edit, roles: ROLE_ADMIN }
+        - { path: ^/event/[0-9]+/delete, roles: ROLE_ADMIN }
+        # Accès admin uniquement pour les pages de gestion des tickets
+        - { path: ^/ticket/stats, roles: ROLE_ADMIN }
+        - { path: ^/ticket/?$, roles: ROLE_ADMIN }
+        - { path: ^/ticket/new, roles: ROLE_ADMIN }
+        - { path: ^/ticket/[0-9]+/edit, roles: ROLE_ADMIN }
+        - { path: ^/ticket/[0-9]+/delete, roles: ROLE_ADMIN }
+        - { path: ^/sponsor/[0-9]+/edit, roles: ROLE_ADMIN }
+        - { path: ^/sponsor/[0-9]+/delete, roles: ROLE_ADMIN }
+        - { path: ^/sponsor/contract/[0-9]+/edit, roles: ROLE_ADMIN }
+        - { path: ^/sponsor/contract/[0-9]+/delete, roles: ROLE_ADMIN }
+        - { path: ^/sponsorship/[0-9]+/edit, roles: ROLE_ADMIN }
+        - { path: ^/sponsorship/[0-9]+/delete, roles: ROLE_ADMIN }
+        # Accès public pour les listes et détails (après les routes spécifiques)
+        - { path: ^/sponsor/contract, roles: PUBLIC_ACCESS }
+        - { path: ^/sponsorship, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

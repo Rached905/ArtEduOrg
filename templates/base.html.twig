@@ -13,6 +13,140 @@
 
     {% block stylesheets %}{% endblock %}
 
+    <style>
+        /* Style pour le bouton "Créer un Ticket" */
+        .btn-ticket-create {
+            background-color: #0d9488 !important;
+            border-color: #0d9488 !important;
+            color: white !important;
+            padding: 10px 20px !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            text-decoration: none !important;
+        }
+        
+        .btn-ticket-create:hover {
+            background-color: #0f766e !important;
+            border-color: #0f766e !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+        }
+        
+        .btn-ticket-create:active {
+            transform: translateY(0);
+        }
+        
+        .btn-ticket-create i {
+            font-size: 1.1em;
+        }
+
+        /* Style uniforme pour toutes les cards de statistiques */
+        .dashboard-stat-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            color: white;
+            height: 100%;
+            position: relative;
+        }
+
+        .dashboard-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-stat-card .card-body {
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .dashboard-stat-card .stat-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-stat-card .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-stat-card .stat-icon {
+            font-size: 3rem;
+            opacity: 0.3;
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .dashboard-stat-card .stat-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .dashboard-stat-card .stat-button {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .dashboard-stat-card .stat-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* Gradients standards pour les cards */
+        .stat-card-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card-green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-card-cyan {
+            background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%);
+        }
+
+        .stat-card-yellow {
+            background: linear-gradient(135deg, #fbb034 0%, #ffdd00 100%);
+        }
+
+        .stat-card-teal {
+            background: linear-gradient(135deg, #0cebeb 0%, #20e3b2 100%);
+        }
+
+        .stat-card-orange {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-card-blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+    </style>
     
 </head>
 <body >

@@ -1,0 +1,192 @@
+{% extends 'basec.html.twig' %}
+
+{% block title %}Mes Événements Favoris - ArtMarket{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="page-header mb-5">
+            <h1 class="page-title">
+                <i class="fas fa-star"></i>
+                Mes Événements Favoris
+            </h1>
+            <p class="text-muted">Retrouvez tous vos événements favoris</p>
+        </div>
+
+        {# Message si aucun favori #}
+        <div class="text-center py-5">
+            <i class="fas fa-star fa-5x text-muted mb-4" style="opacity: 0.3;"></i>
+            <h3 class="text-muted">Aucun événement favori pour le moment</h3>
+            <p class="text-muted">Ajoutez des événements à vos favoris pour les retrouver facilement !</p>
+            <a href="{{ path('app_client_evenements') }}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-calendar-alt"></i> Découvrir les événements
+            </a>
+        </div>
+
+        {# Section pour afficher les favoris (à implémenter plus tard) #}
+        {# 
+        {% if favoris|length > 0 %}
+        <div class="row g-4">
+            {% for event in favoris %}
+            <div class="col-md-4">
+                <div class="event-card-modern">
+                    <div class="event-image-modern">
+                        <div class="event-badge-modern">Favori</div>
+                        <i class="fas fa-calendar-alt fa-3x"></i>
+                    </div>
+                    <div class="event-content-modern">
+                        <h4 class="event-title-modern">{{ event.title }}</h4>
+                        <p class="event-description-modern">{{ event.description|slice(0, 100) }}{% if event.description|length > 100 %}...{% endif %}</p>
+                        <div class="event-info-modern">
+                            <div class="event-info-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>{{ event.startDate ? event.startDate|date('d/m/Y H:i') : 'N/A' }}</span>
+                            </div>
+                            <div class="event-info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ event.location ?: 'Lieu à confirmer' }}</span>
+                            </div>
+                            <div class="event-info-item">
+                                <i class="fas fa-euro-sign"></i>
+                                <span>{{ event.price ? event.price ~ ' €' : 'Gratuit' }}</span>
+                            </div>
+                        </div>
+                        <div class="event-footer-modern">
+                            <a href="{{ path('app_event_show', {id: event.id}) }}" class="btn-event-modern">
+                                Voir détails <i class="fas fa-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        #}
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-gradient: linear-gradient(135deg, #e94560 0%, #d63850 100%);
+    --accent-color: #e94560;
+    --dark-color: #1a1a2e;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.event-card-modern {
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    transition: all 0.4s ease;
+    border: 2px solid transparent;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-card-modern:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 60px rgba(233, 69, 96, 0.2);
+    border-color: var(--accent-color);
+}
+
+.event-image-modern {
+    position: relative;
+    height: 200px;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    overflow: hidden;
+}
+
+.event-badge-modern {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.event-content-modern {
+    padding: 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-title-modern {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+}
+
+.event-description-modern {
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+.event-info-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.event-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.event-info-item i {
+    color: var(--accent-color);
+    width: 20px;
+}
+
+.event-footer-modern {
+    margin-top: auto;
+}
+
+.btn-event-modern {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 30px;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.4s ease;
+    border: none;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-event-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+    color: white;
+}
+</style>
+{% endblock %}
+

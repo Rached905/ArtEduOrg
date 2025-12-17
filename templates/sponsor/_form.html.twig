@@ -1,0 +1,95 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true, 'id': 'sponsor-form'}}) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.name, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.email, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.phone, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.type, {'attr': {'class': 'form-select'}}) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.sponsorType, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="col-md-6 mb-3" id="event-select-container">
+            {{ form_row(form.event, {'attr': {'class': 'form-select'}}) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.website, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.logoFile, {'attr': {'class': 'form-control'}}) }}
+            {% if sponsor.logo %}
+                <div class="mt-2">
+                    <small class="text-muted">Logo actuel :</small><br>
+                    <img src="{{ asset('uploads/sponsors/' ~ sponsor.logo) }}" alt="Logo {{ sponsor.name }}" style="max-height: 100px; max-width: 200px;" class="mt-2">
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+        <a href="{{ path('app_sponsor_index') }}" class="btn btn-secondary">Annuler</a>
+    </div>
+{{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('sponsor-form');
+    if (!form) return;
+    
+    // Gestion du type de sponsorisation
+    const sponsorTypeSelect = document.getElementById('sponsor_type_choice');
+    const eventSelectContainer = document.getElementById('event-select-container');
+    const eventSelect = document.getElementById('sponsor_event_select');
+    
+    function toggleEventSelect() {
+        if (sponsorTypeSelect && eventSelectContainer) {
+            if (sponsorTypeSelect.value === 'event') {
+                eventSelectContainer.style.display = 'block';
+                if (eventSelect) {
+                    eventSelect.setAttribute('required', 'required');
+                }
+            } else {
+                eventSelectContainer.style.display = 'none';
+                if (eventSelect) {
+                    eventSelect.removeAttribute('required');
+                    eventSelect.value = '';
+                }
+            }
+        }
+    }
+    
+    // Initialiser l'affichage au chargement
+    toggleEventSelect();
+    
+    // Écouter les changements
+    if (sponsorTypeSelect) {
+        sponsorTypeSelect.addEventListener('change', toggleEventSelect);
+    }
+    
+    // Validation du formulaire avant soumission
+    form.addEventListener('submit', function(e) {
+        if (sponsorTypeSelect && sponsorTypeSelect.value === 'event') {
+            if (!eventSelect || !eventSelect.value) {
+                e.preventDefault();
+                alert('Veuillez sélectionner un événement pour un sponsor d\'événement.');
+                return false;
+            }
+        }
+    });
+});
+</script>
+
+

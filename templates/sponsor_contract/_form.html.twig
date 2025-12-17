@@ -1,0 +1,101 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.contractNumber, {
+                'attr': {'class': 'form-control'},
+                'label': 'Numéro de contrat',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.sponsor, {
+                'attr': {'class': 'form-select'},
+                'label': 'Sponsor',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            {{ form_row(form.signedAt, {
+                'attr': {'class': 'form-control', 'id': 'signedAt'},
+                'label': 'Date de signature',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form_row(form.expiresAt, {
+                'attr': {'class': 'form-control', 'id': 'expiresAt'},
+                'label': 'Date d\'expiration',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form_row(form.level, {
+                'attr': {'class': 'form-select'},
+                'label': 'Niveau',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.terms, {
+            'attr': {'class': 'form-control', 'rows': 5},
+            'label': 'Conditions',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a href="{{ path('app_sponsor_contract_index') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Annuler
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
+{{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const signedAtInput = document.getElementById('signedAt');
+    const expiresAtInput = document.getElementById('expiresAt');
+    const contractNumberInput = document.querySelector('input[name*="[contractNumber]"]');
+    const termsTextarea = document.querySelector('textarea[name*="[terms]"]');
+    
+    // Validation du numéro de contrat
+    if (contractNumberInput) {
+        contractNumberInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^A-Z0-9\-_]/gi, '');
+        });
+    }
+    
+    // Mettre à jour la date minimum d'expiration quand la date de signature change
+    if (signedAtInput && expiresAtInput) {
+        signedAtInput.addEventListener('change', function() {
+            if (this.value) {
+                const signedDate = new Date(this.value);
+                signedDate.setDate(signedDate.getDate() + 1);
+                const minDate = signedDate.toISOString().split('T')[0];
+                expiresAtInput.setAttribute('min', minDate);
+                
+                if (expiresAtInput.value && expiresAtInput.value <= this.value) {
+                    expiresAtInput.value = minDate;
+                }
+            }
+        });
+        
+        expiresAtInput.addEventListener('change', function() {
+            if (signedAtInput.value && this.value) {
+                if (this.value <= signedAtInput.value) {
+                    this.setCustomValidity('La date d\'expiration doit être postérieure à la date de signature');
+                } else {
+                    this.setCustomValidity('');
+                }
+            }
+        });
+    }
+});
+</script>
+
+

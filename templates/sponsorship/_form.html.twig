@@ -1,0 +1,98 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
+    <div class="mb-3">
+        {{ form_row(form.description, {
+            'attr': {'class': 'form-control', 'rows': 4},
+            'label': 'Description',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.sponsor, {
+                'attr': {'class': 'form-select'},
+                'label': 'Sponsor',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.amount, {
+                'attr': {'class': 'form-control', 'step': '0.01'},
+                'label': 'Montant',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.type, {
+                'attr': {'class': 'form-select'},
+                'label': 'Type',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_row(form.sponsorshipType, {
+                'attr': {'class': 'form-select'},
+                'label': 'Type de parrainage',
+                'label_attr': {'class': 'form-label fw-bold'}
+            }) }}
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a href="{{ path('app_sponsorship_index') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Annuler
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
+{{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const descriptionTextarea = document.querySelector('textarea[name*="[description]"]');
+    const amountInput = document.querySelector('input[name*="[amount]"]');
+    
+    // Validation de la description
+    if (descriptionTextarea) {
+        descriptionTextarea.addEventListener('blur', function() {
+            const value = this.value.trim();
+            if (value && (value.length < 10 || value.length > 2000)) {
+                this.setCustomValidity('La description doit contenir entre 10 et 2000 caractères');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Validation du montant
+    if (amountInput) {
+        amountInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9.]/g, '');
+            
+            const parts = this.value.split('.');
+            if (parts.length > 2) {
+                this.value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            if (parts.length === 2 && parts[1].length > 2) {
+                this.value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+        });
+        
+        amountInput.addEventListener('blur', function() {
+            const value = parseFloat(this.value);
+            if (isNaN(value) || value <= 0) {
+                this.setCustomValidity('Le montant doit être un nombre positif');
+            } else if (value > 9999999.99) {
+                this.setCustomValidity('Le montant ne peut pas dépasser 9999999.99');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
+</script>
+
+

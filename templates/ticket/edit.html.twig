@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le ticket{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-edit"></i>
+                Modifier le ticket
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_ticket_index') }}">Ventes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Modifier</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_ticket_index') }}" class="btn btn-reset">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="stat-card">
+    {{ include('ticket/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+    {{ include('ticket/_delete_form.html.twig') }}
+</div>
+{% endblock %}
+
+

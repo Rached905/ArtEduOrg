@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouveau ticket{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-ticket-alt"></i>
+                Créer un nouveau ticket
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_ticket_index') }}">Ventes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Nouveau ticket</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_ticket_index') }}" class="btn btn-reset">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="stat-card">
+    <h5 class="mb-4"><i class="fas fa-shopping-cart"></i> Informations du ticket</h5>
+    <div>
+        {{ include('ticket/_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}
+
+

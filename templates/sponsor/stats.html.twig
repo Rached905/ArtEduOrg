@@ -1,0 +1,324 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques du Sponsoring{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stats-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card.blue .stat-card-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .stat-card.green .stat-card-icon { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .stat-card.purple .stat-card-icon { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+    .stat-card.orange .stat-card-icon { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+    .stat-card.red .stat-card-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .card-modern {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-modern .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 2px solid #e9ecef;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+    }
+
+    .sponsor-item {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+
+    .sponsor-item:hover {
+        background: #f8f9fa;
+    }
+
+    .sponsor-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="stats-header mt-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1><i class="fas fa-handshake me-2"></i>Statistiques du Sponsoring</h1>
+                <p class="mb-0">Vue d'ensemble de votre activité de sponsoring</p>
+            </div>
+            <span class="badge bg-light text-dark px-3 py-2">
+                <i class="far fa-calendar-alt me-2"></i>{{ "now"|date("d/m/Y") }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card blue">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ total_sponsors }}</div>
+                    <div class="stat-label">Total des Sponsors</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card green">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="stat-value">{{ total_contracts }}</div>
+                    <div class="stat-label">Total des Contrats</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card purple">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="stat-value">{{ total_sponsorships }}</div>
+                    <div class="stat-label">Total des Parrainages</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card orange">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value">{{ total_sponsoring }}</div>
+                    <div class="stat-label">Total Général</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques des contrats -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card green">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ active_contracts }}</div>
+                    <div class="stat-label">Contrats Actifs</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card red">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ expired_contracts }}</div>
+                    <div class="stat-label">Contrats Expirés</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card purple">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="stat-value">{{ (total_contract_value)|number_format(2, ',', ' ') }} €</div>
+                    <div class="stat-label">Valeur Totale Contrats</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card blue">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="stat-value">{{ active_sponsorships }}</div>
+                    <div class="stat-label">Parrainages Actifs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques mensuelles -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-md-4">
+            <div class="card stat-card blue">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="stat-value">{{ sponsors_this_month }}</div>
+                    <div class="stat-label">Sponsors Ce Mois</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-4">
+            <div class="card stat-card green">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="stat-value">{{ contracts_this_month }}</div>
+                    <div class="stat-label">Contrats Ce Mois</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-4">
+            <div class="card stat-card purple">
+                <div class="card-body">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="stat-value">{{ sponsorships_this_month }}</div>
+                    <div class="stat-label">Parrainages Ce Mois</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Derniers éléments -->
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-clock me-2"></i>Derniers Sponsors
+                </div>
+                <div class="card-body">
+                    {% if recent_sponsors|length > 0 %}
+                        {% for sponsor in recent_sponsors %}
+                            <div class="sponsor-item">
+                                <h6 class="mb-1">{{ sponsor.name }}</h6>
+                                <small class="text-muted">
+                                    {% if sponsor.email %}
+                                        <i class="fas fa-envelope me-1"></i>{{ sponsor.email }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun sponsor</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-clock me-2"></i>Derniers Contrats
+                </div>
+                <div class="card-body">
+                    {% if recent_contracts|length > 0 %}
+                        {% for contract in recent_contracts %}
+                            <div class="sponsor-item">
+                                <h6 class="mb-1">
+                                    {% if contract.sponsor %}
+                                        {{ contract.sponsor.name }}
+                                    {% else %}
+                                        Contrat #{{ contract.id }}
+                                    {% endif %}
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-file-contract me-1"></i>{{ contract.contractNumber }}
+                                    {% if contract.expiresAt %}
+                                        <br><i class="fas fa-calendar me-1"></i>Expire le {{ contract.expiresAt|date('d/m/Y') }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun contrat</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="fas fa-clock me-2"></i>Derniers Parrainages
+                </div>
+                <div class="card-body">
+                    {% if recent_sponsorships|length > 0 %}
+                        {% for sponsorship in recent_sponsorships %}
+                            <div class="sponsor-item">
+                                <h6 class="mb-1">
+                                    {% if sponsorship.sponsor %}
+                                        {{ sponsorship.sponsor.name }}
+                                    {% else %}
+                                        Parrainage #{{ sponsorship.id }}
+                                    {% endif %}
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-euro-sign me-1"></i>{{ (sponsorship.amount ?? 0)|number_format(2, ',', ' ') }} €
+                                    {% if sponsorship.sponsorshipType %}
+                                        <br><i class="fas fa-tag me-1"></i>{{ sponsorship.sponsorshipType.value }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">Aucun parrainage</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

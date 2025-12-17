@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .content {
+            background: #f9fafb;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+        .contract-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+        .contract-table th {
+            background: #3b82f6;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+        }
+        .contract-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .contract-table tr:hover {
+            background: #f3f4f6;
+        }
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+            font-size: 12px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .badge-urgent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .badge-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .badge-info {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Notification de Contrats Expirants</h1>
+    </div>
+    
+    <div class="content">
+        <p>Bonjour,</p>
+        
+        <p>Nous vous informons que <strong>{{ contracts|length }} contrat(s)</strong> de sponsoring {{ contracts|length > 1 ? 'expirent' : 'expire' }} dans les <strong>{{ days }} prochains jours</strong>.</p>
+        
+        <div class="warning">
+            <strong>⚠️ Action requise :</strong> Veuillez prendre les mesures nécessaires pour renouveler ou gérer ces contrats avant leur expiration.
+        </div>
+        
+        <h2>Détails des contrats expirants :</h2>
+        
+        <table class="contract-table">
+            <thead>
+                <tr>
+                    <th>Numéro</th>
+                    <th>Sponsor</th>
+                    <th>Email</th>
+                    <th>Date d'expiration</th>
+                    <th>Jours restants</th>
+                    <th>Niveau</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in contracts %}
+                <tr>
+                    <td><strong>{{ contract.contractNumber }}</strong></td>
+                    <td>{{ contract.sponsor ? contract.sponsor.name : 'N/A' }}</td>
+                    <td>{{ contract.sponsor ? contract.sponsor.email : 'N/A' }}</td>
+                    <td>{{ contract.expiresAt|date('d/m/Y') }}</td>
+                    <td>
+                        {% set daysLeft = contract.daysUntilExpiration %}
+                        {% if daysLeft <= 7 %}
+                            <span class="badge badge-urgent">{{ daysLeft }} jour(s)</span>
+                        {% elseif daysLeft <= 15 %}
+                            <span class="badge badge-warning">{{ daysLeft }} jour(s)</span>
+                        {% else %}
+                            <span class="badge badge-info">{{ daysLeft }} jour(s)</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ contract.level ? contract.level.value : 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <p><strong>Période de notification :</strong> {{ periodStart|date('d/m/Y') }} - {{ periodEnd|date('d/m/Y') }}</p>
+        
+        <p>Cordialement,<br>Système de Gestion des Sponsors</p>
+    </div>
+    
+    <div class="footer">
+        <p>Cet email a été généré automatiquement. Veuillez ne pas y répondre.</p>
+    </div>
+</body>
+</html>
+

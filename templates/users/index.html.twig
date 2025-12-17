@@ -256,62 +256,42 @@
     <!-- Statistiques -->
     <div class="row g-4 mb-4">
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card clients h-100">
+            <div class="card dashboard-stat-card stat-card-cyan">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-muted small text-uppercase mb-1">Clients</div>
-                            <div class="h3 mb-0 font-weight-bold">{{ users|filter(u => u.role.value == 'CLIENT')|length }}</div>
-                        </div>
-                        <div class="stats-icon text-primary">
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-title">Clients</div>
+                    <div class="stat-value">{{ users|filter(u => u.role.value == 'CLIENT')|length }}</div>
+                    <a href="{{ path('app_users_index') }}" class="stat-button">Voir détails →</a>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card vendors h-100">
+            <div class="card dashboard-stat-card stat-card-green">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-muted small text-uppercase mb-1">Vendeurs</div>
-                            <div class="h3 mb-0 font-weight-bold">{{ users|filter(u => u.role.value == 'VENDEUR')|length }}</div>
-                        </div>
-                        <div class="stats-icon text-success">
-                            <i class="fas fa-store"></i>
-                        </div>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-store"></i></div>
+                    <div class="stat-title">Vendeurs</div>
+                    <div class="stat-value">{{ users|filter(u => u.role.value == 'VENDEUR')|length }}</div>
+                    <a href="{{ path('app_users_index') }}" class="stat-button">Voir détails →</a>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card admins h-100">
+            <div class="card dashboard-stat-card stat-card-orange">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-muted small text-uppercase mb-1">Administrateurs</div>
-                            <div class="h3 mb-0 font-weight-bold">{{ users|filter(u => u.role.value == 'ADMIN')|length }}</div>
-                        </div>
-                        <div class="stats-icon text-danger">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-user-shield"></i></div>
+                    <div class="stat-title">Administrateurs</div>
+                    <div class="stat-value">{{ users|filter(u => u.role.value == 'ADMIN')|length }}</div>
+                    <a href="{{ path('app_users_index') }}" class="stat-button">Voir détails →</a>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card stats-card total h-100">
+            <div class="card dashboard-stat-card stat-card-blue">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="text-muted small text-uppercase mb-1">Total Utilisateurs</div>
-                            <div class="h3 mb-0 font-weight-bold">{{ users|length }}</div>
-                        </div>
-                        <div class="stats-icon text-secondary">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-title">Total Utilisateurs</div>
+                    <div class="stat-value">{{ users|length }}</div>
+                    <div class="stat-subtitle">Éléments totaux</div>
                 </div>
             </div>
         </div>

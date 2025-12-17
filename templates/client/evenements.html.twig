@@ -1,0 +1,340 @@
+{% extends 'basec.html.twig' %}
+
+{% block title %}Tous les Événements - ArtMarket{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="page-header mb-5">
+            <h1 class="page-title">
+                <i class="fas fa-calendar-alt"></i>
+                Tous les Événements
+            </h1>
+            <p class="text-muted">Découvrez tous les événements artistiques disponibles</p>
+        </div>
+
+        {# Filtres #}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active" onclick="filterEvents('all')">
+                                Tous
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="filterEvents('upcoming')">
+                                À venir
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="filterEvents('ongoing')">
+                                En cours
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="filterEvents('past')">
+                                Terminés
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Événements à venir #}
+        {% if upcoming_events|length > 0 %}
+        <div class="events-section" data-filter="upcoming">
+            <h3 class="section-title mb-4">
+                <i class="fas fa-calendar-clock"></i> Événements à venir
+            </h3>
+            <div class="row g-4">
+                {% for event in upcoming_events %}
+                <div class="col-md-4">
+                    <div class="event-card-modern">
+                        <div class="event-image-modern">
+                            <div class="event-badge-modern">À venir</div>
+                            <i class="fas fa-calendar-alt fa-3x"></i>
+                        </div>
+                        <div class="event-content-modern">
+                            <h4 class="event-title-modern">{{ event.title }}</h4>
+                            <p class="event-description-modern">{{ event.description|slice(0, 100) }}{% if event.description|length > 100 %}...{% endif %}</p>
+                            <div class="event-info-modern">
+                                <div class="event-info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>{{ event.startDate ? event.startDate|date('d/m/Y H:i') : 'N/A' }}</span>
+                                </div>
+                                <div class="event-info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ event.location ?: 'Lieu à confirmer' }}</span>
+                                </div>
+                                <div class="event-info-item">
+                                    <i class="fas fa-euro-sign"></i>
+                                    <span>{{ event.price ? event.price ~ ' €' : 'Gratuit' }}</span>
+                                </div>
+                                {% if event.capacity %}
+                                <div class="event-info-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>{{ event.capacity - event.ticketsSold }} places disponibles</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="event-footer-modern">
+                                <a href="{{ path('app_event_show', {id: event.id}) }}" class="btn-event-modern">
+                                    Voir détails <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Événements en cours #}
+        {% if ongoing_events|length > 0 %}
+        <div class="events-section mt-5" data-filter="ongoing">
+            <h3 class="section-title mb-4">
+                <i class="fas fa-play-circle"></i> Événements en cours
+            </h3>
+            <div class="row g-4">
+                {% for event in ongoing_events %}
+                <div class="col-md-4">
+                    <div class="event-card-modern">
+                        <div class="event-image-modern" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                            <div class="event-badge-modern" style="background: #11998e;">En cours</div>
+                            <i class="fas fa-play-circle fa-3x"></i>
+                        </div>
+                        <div class="event-content-modern">
+                            <h4 class="event-title-modern">{{ event.title }}</h4>
+                            <p class="event-description-modern">{{ event.description|slice(0, 100) }}{% if event.description|length > 100 %}...{% endif %}</p>
+                            <div class="event-info-modern">
+                                <div class="event-info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>{{ event.startDate ? event.startDate|date('d/m/Y H:i') : 'N/A' }}</span>
+                                </div>
+                                <div class="event-info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ event.location ?: 'Lieu à confirmer' }}</span>
+                                </div>
+                                <div class="event-info-item">
+                                    <i class="fas fa-euro-sign"></i>
+                                    <span>{{ event.price ? event.price ~ ' €' : 'Gratuit' }}</span>
+                                </div>
+                                {% if event.capacity %}
+                                <div class="event-info-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>{{ event.capacity - event.ticketsSold }} places disponibles</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="event-footer-modern">
+                                <a href="{{ path('app_event_show', {id: event.id}) }}" class="btn-event-modern">
+                                    Voir détails <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Événements terminés #}
+        {% if past_events|length > 0 %}
+        <div class="events-section mt-5" data-filter="past">
+            <h3 class="section-title mb-4">
+                <i class="fas fa-check-circle"></i> Événements terminés
+            </h3>
+            <div class="row g-4">
+                {% for event in past_events %}
+                <div class="col-md-4">
+                    <div class="event-card-modern" style="opacity: 0.7;">
+                        <div class="event-image-modern" style="background: linear-gradient(135deg, #666 0%, #999 100%);">
+                            <div class="event-badge-modern" style="background: #666;">Terminé</div>
+                            <i class="fas fa-check-circle fa-3x"></i>
+                        </div>
+                        <div class="event-content-modern">
+                            <h4 class="event-title-modern">{{ event.title }}</h4>
+                            <p class="event-description-modern">{{ event.description|slice(0, 100) }}{% if event.description|length > 100 %}...{% endif %}</p>
+                            <div class="event-info-modern">
+                                <div class="event-info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>{{ event.startDate ? event.startDate|date('d/m/Y H:i') : 'N/A' }}</span>
+                                </div>
+                                <div class="event-info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ event.location ?: 'Lieu à confirmer' }}</span>
+                                </div>
+                            </div>
+                            <div class="event-footer-modern">
+                                <a href="{{ path('app_event_show', {id: event.id}) }}" class="btn-event-modern" style="background: #666;">
+                                    Voir détails <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if upcoming_events|length == 0 and ongoing_events|length == 0 and past_events|length == 0 %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-5x text-muted mb-4"></i>
+            <h3 class="text-muted">Aucun événement disponible</h3>
+            <p class="text-muted">Revenez bientôt pour découvrir de nouveaux événements !</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-gradient: linear-gradient(135deg, #e94560 0%, #d63850 100%);
+    --accent-color: #e94560;
+    --dark-color: #1a1a2e;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.event-card-modern {
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    transition: all 0.4s ease;
+    border: 2px solid transparent;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-card-modern:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 60px rgba(233, 69, 96, 0.2);
+    border-color: var(--accent-color);
+}
+
+.event-image-modern {
+    position: relative;
+    height: 200px;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    overflow: hidden;
+}
+
+.event-badge-modern {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.event-content-modern {
+    padding: 30px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-title-modern {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+}
+
+.event-description-modern {
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+.event-info-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.event-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.event-info-item i {
+    color: var(--accent-color);
+    width: 20px;
+}
+
+.event-footer-modern {
+    margin-top: auto;
+}
+
+.btn-event-modern {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 30px;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.4s ease;
+    border: none;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-event-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+    color: white;
+}
+</style>
+
+<script>
+function filterEvents(filter) {
+    const sections = document.querySelectorAll('.events-section');
+    const buttons = document.querySelectorAll('.btn-group .btn');
+    
+    // Mettre à jour les boutons actifs
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Afficher/masquer les sections
+    sections.forEach(section => {
+        if (filter === 'all') {
+            section.style.display = 'block';
+        } else {
+            const sectionFilter = section.getAttribute('data-filter');
+            section.style.display = sectionFilter === filter ? 'block' : 'none';
+        }
+    });
+}
+</script>
+{% endblock %}
+

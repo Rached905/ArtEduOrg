@@ -1,0 +1,8 @@
+<form method="post" action="{{ path('app_sponsorship_delete', {'id': sponsorship.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce parrainage ?');" style="display: inline-block;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sponsorship.id) }}">
+    <button class="btn btn-danger">
+        <i class="fas fa-trash"></i> Supprimer
+    </button>
+</form>
+
+

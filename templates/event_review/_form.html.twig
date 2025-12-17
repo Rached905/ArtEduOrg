@@ -1,0 +1,165 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+<div class="row">
+    <div class="col-md-12 mb-3">
+        {{ form_row(form.event, {
+            'attr': {'class': 'form-select'},
+            'label': 'Événement',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <label class="form-label fw-bold">Note <span class="text-danger">*</span></label>
+        <div class="star-rating-container">
+            <div class="star-rating" id="starRating">
+                {% for i in 1..5 %}
+                    <i class="far fa-star star-icon" data-rating="{{ i }}" style="font-size: 2rem; color: #ffc107; cursor: pointer; margin-right: 5px;"></i>
+                {% endfor %}
+            </div>
+            {{ form_widget(form.rating, {'attr': {'class': 'd-none'}}) }}
+            <div class="invalid-feedback d-block">
+                {{ form_errors(form.rating) }}
+            </div>
+            <small class="text-muted d-block mt-2">Cliquez sur les étoiles pour noter (1 à 5 étoiles)</small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-3">
+        {{ form_row(form.comment, {
+            'attr': {'class': 'form-control'},
+            'label': 'Commentaire',
+            'label_attr': {'class': 'form-label fw-bold'}
+        }) }}
+    </div>
+</div>
+
+<div class="d-flex justify-content-end gap-2 mt-4">
+    {% if eventId is defined and eventId %}
+        <a href="{{ path('app_event_show', {'id': eventId}) }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Annuler
+        </a>
+    {% else %}
+        <a href="{{ path('app_event_review_index') }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Annuler
+        </a>
+    {% endif %}
+    <button type="submit" class="btn btn-success">
+        <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+</div>
+
+{{ form_end(form) }}
+
+<style>
+.star-rating-container {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.star-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.star-icon {
+    transition: all 0.2s ease;
+}
+
+.star-icon:hover {
+    transform: scale(1.2);
+}
+
+.star-icon.active,
+.star-icon.filled {
+    color: #ffc107 !important;
+}
+
+.star-icon.filled::before {
+    content: "\f005"; /* Font Awesome filled star */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-icon');
+    const ratingInput = document.querySelector('input[name="{{ form.rating.vars.full_name }}"]');
+    const currentRating = ratingInput && ratingInput.value ? parseInt(ratingInput.value) : 0;
+    
+    // Initialize stars based on current rating
+    if (currentRating > 0) {
+        updateStars(currentRating);
+    }
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            if (ratingInput) {
+                ratingInput.value = rating;
+            }
+            updateStars(rating);
+        });
+        
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            highlightStars(rating);
+        });
+    });
+    
+    document.getElementById('starRating').addEventListener('mouseleave', function() {
+        const currentRating = ratingInput && ratingInput.value ? parseInt(ratingInput.value) : 0;
+        if (currentRating > 0) {
+            updateStars(currentRating);
+        } else {
+            clearStars();
+        }
+    });
+    
+    function updateStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('filled', 'active');
+                star.classList.remove('far');
+                star.classList.add('fas');
+            } else {
+                star.classList.remove('filled', 'active');
+                star.classList.remove('fas');
+                star.classList.add('far');
+            }
+        });
+    }
+    
+    function highlightStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.style.color = '#ffc107';
+                star.style.transform = 'scale(1.1)';
+            } else {
+                star.style.color = '#ddd';
+                star.style.transform = 'scale(1)';
+            }
+        });
+    }
+    
+    function clearStars() {
+        stars.forEach(star => {
+            star.classList.remove('filled', 'active');
+            star.classList.remove('fas');
+            star.classList.add('far');
+            star.style.color = '#ffc107';
+            star.style.transform = 'scale(1)';
+        });
+    }
+});
+</script>
+
+

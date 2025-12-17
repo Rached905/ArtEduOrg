@@ -1,0 +1,210 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'événement{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-edit"></i>
+                Modifier l'événement
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_event_admin_index') }}">Événements</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Modifier</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_event_admin_index') }}" class="btn btn-reset">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="stat-card mb-4">
+            <h5 class="mb-4">
+                <i class="fas fa-edit"></i> Modifier les informations de l'événement
+            </h5>
+            <div>
+                {{ include('event/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+            </div>
+        </div>
+
+        <div class="stat-card" style="border-left: 4px solid #e74c3c;">
+            <h5 class="mb-3" style="color: #e74c3c;">
+                <i class="fas fa-trash"></i> Zone de danger
+            </h5>
+            <p class="text-muted">Une fois supprimé, cet événement ne pourra plus être récupéré.</p>
+            {{ include('event/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+<style>
+#map {
+    margin-top: 10px;
+    z-index: 1;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.leaflet-container {
+    font-family: inherit;
+}
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Coordonnées par défaut (Tunis, Tunisie)
+    let defaultLat = 36.8065;
+    let defaultLng = 10.1815;
+    let zoom = 13;
+
+    // Récupérer les valeurs existantes si disponibles
+    const latInput = document.getElementById('event_latitude');
+    const lngInput = document.getElementById('event_longitude');
+    const addressInput = document.getElementById('event_address');
+    const locationInput = document.getElementById('event_location');
+
+    if (latInput && latInput.value) {
+        defaultLat = parseFloat(latInput.value);
+    }
+    if (lngInput && lngInput.value) {
+        defaultLng = parseFloat(lngInput.value);
+    }
+
+    // Initialiser la carte
+    const map = L.map('map').setView([defaultLat, defaultLng], zoom);
+
+    // Ajouter la couche de tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Marqueur pour l'emplacement sélectionné
+    let marker = null;
+
+    // Si des coordonnées existent, placer le marqueur
+    if (latInput && latInput.value && lngInput && lngInput.value) {
+        marker = L.marker([defaultLat, defaultLng]).addTo(map);
+    }
+
+    // Fonction pour mettre à jour les champs avec les coordonnées
+    function updateLocation(lat, lng) {
+        if (latInput) latInput.value = lat.toFixed(7);
+        if (lngInput) lngInput.value = lng.toFixed(7);
+
+        // Utiliser Nominatim pour obtenir l'adresse
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.address) {
+                    const addressParts = [];
+                    if (data.address.road) addressParts.push(data.address.road);
+                    if (data.address.house_number) addressParts.push(data.address.house_number);
+                    if (data.address.city || data.address.town || data.address.village) {
+                        addressParts.push(data.address.city || data.address.town || data.address.village);
+                    }
+                    if (data.address.country) addressParts.push(data.address.country);
+                    
+                    const fullAddress = addressParts.join(', ');
+                    if (addressInput) addressInput.value = fullAddress;
+                    if (locationInput && !locationInput.value) {
+                        locationInput.value = fullAddress;
+                    }
+                } else if (data && data.display_name) {
+                    if (addressInput) addressInput.value = data.display_name;
+                    if (locationInput && !locationInput.value) {
+                        locationInput.value = data.display_name;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération de l\'adresse:', error);
+            });
+    }
+
+    // Gérer le clic sur la carte
+    map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        // Supprimer l'ancien marqueur s'il existe
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        // Ajouter un nouveau marqueur
+        marker = L.marker([lat, lng]).addTo(map);
+
+        // Mettre à jour les champs
+        updateLocation(lat, lng);
+    });
+
+    // Recherche d'adresse avec géocodage
+    if (locationInput) {
+        let searchTimeout;
+        locationInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+
+            if (query.length < 3) return;
+
+            searchTimeout = setTimeout(() => {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const result = data[0];
+                            const lat = parseFloat(result.lat);
+                            const lng = parseFloat(result.lon);
+
+                            // Centrer la carte sur le résultat
+                            map.setView([lat, lng], 15);
+
+                            // Supprimer l'ancien marqueur
+                            if (marker) {
+                                map.removeLayer(marker);
+                            }
+
+                            // Ajouter un nouveau marqueur
+                            marker = L.marker([lat, lng]).addTo(map);
+
+                            // Mettre à jour les coordonnées
+                            if (latInput) latInput.value = lat.toFixed(7);
+                            if (lngInput) lngInput.value = lng.toFixed(7);
+                            if (addressInput) addressInput.value = result.display_name;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la recherche:', error);
+                    });
+            }, 500);
+        });
+    }
+});
+</script>
+{% endblock %}
+
+

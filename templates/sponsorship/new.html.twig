@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un Parrainage{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-gift"></i>
+                Créer un Parrainage
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('app_sponsorship_index') }}">Parrainages</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Nouveau</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ path('app_sponsorship_index') }}" class="btn btn-reset">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {{ include('sponsorship/_form.html.twig', {'button_label': 'Créer le parrainage'}) }}
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrat de Sponsoring - {{ contract.contractNumber }}</title>
+    <style>
+        @page {
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background-color: #0d9488;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        .logo-text {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 30px;
+        }
+        
+        .parties {
+            margin-bottom: 30px;
+        }
+        
+        .party-section {
+            margin-bottom: 15px;
+        }
+        
+        .party-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .party-info {
+            margin-left: 20px;
+        }
+        
+        .party-name {
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        .party-contact {
+            font-size: 11px;
+            color: #333;
+        }
+        
+        .article {
+            margin-bottom: 20px;
+        }
+        
+        .article-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .article-content {
+            text-align: justify;
+            margin-left: 10px;
+        }
+        
+        .signatures {
+            margin-top: 50px;
+            display: table;
+            width: 100%;
+        }
+        
+        .signature-block {
+            display: table-cell;
+            width: 50%;
+            vertical-align: bottom;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 50px;
+            padding-top: 5px;
+            text-align: center;
+            font-size: 11px;
+        }
+        
+        .stamp {
+            position: absolute;
+            bottom: 2cm;
+            right: 2cm;
+            width: 150px;
+            border: 2px solid #0066cc;
+            padding: 10px;
+            text-align: left;
+            background-color: #f9f9f9;
+        }
+        
+        .stamp-company {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .stamp-admin {
+            font-size: 12px;
+            font-style: italic;
+            color: #0066cc;
+            margin-bottom: 8px;
+            text-align: center;
+            border-bottom: 1px solid #0066cc;
+            padding-bottom: 3px;
+        }
+        
+        .stamp-info {
+            font-size: 9px;
+            color: #0066cc;
+            line-height: 1.4;
+        }
+        
+        .contract-info {
+            margin-bottom: 20px;
+            font-size: 11px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-text">A</div>
+        </div>
+        <div class="title">CONTRAT DE SPONSORING</div>
+    </div>
+
+    <div class="contract-info">
+        <strong>N° de contrat :</strong> {{ contract.contractNumber }}<br>
+        <strong>Date de signature :</strong> {{ contract.signedAt|date('d/m/Y') }}<br>
+        <strong>Date d'expiration :</strong> {{ contract.expiresAt|date('d/m/Y') }}<br>
+        <strong>Niveau :</strong> {{ contract.level.value }}
+    </div>
+
+    <div class="parties">
+        <div class="party-section">
+            <div class="party-label">ENTRE LES SOUSSIGNÉS :</div>
+            <div class="party-info">
+                <div class="party-name">{{ contract.sponsor.name }}</div>
+                <div class="party-contact">
+                    {% if contract.sponsor.phone %}{{ contract.sponsor.phone }}{% endif %}
+                    {% if contract.sponsor.email %} / {{ contract.sponsor.email }}{% endif %}
+                </div>
+                <div style="margin-top: 5px;">sponsor d'une part,</div>
+                <div style="font-size: 10px; margin-top: 3px;">Ci-après dénommé le <strong>Sponsor</strong></div>
+            </div>
+        </div>
+
+        <div class="party-section" style="margin-top: 20px;">
+            <div class="party-label">ET</div>
+            <div class="party-info">
+                <div class="party-name">{{ company.name|default('ARTEDU') }}</div>
+                <div class="party-contact">
+                    {% if company.phone %}{{ company.phone }}{% endif %}
+                    {% if company.email %} / {{ company.email }}{% endif %}
+                </div>
+                <div style="margin-top: 5px;">sponsorisé d'autre part.</div>
+                <div style="font-size: 10px; margin-top: 3px;">Ci-après dénommé le <strong>Sponsorisé</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin: 20px 0;">
+        <p style="text-align: justify; font-style: italic;">
+            Il a été convenu et arrêté ce qui suit :
+        </p>
+    </div>
+
+    <div class="article">
+        <div class="article-title">ARTICLE 1 : OBJET DU CONTRAT</div>
+        <div class="article-content">
+            Le sponsorisé s'engage par le présent contrat à respecter les conditions et obligations définies ci-dessous, 
+            en contrepartie des avantages accordés par le sponsor.
+        </div>
+    </div>
+
+    <div class="article">
+        <div class="article-title">ARTICLE 2 : DURÉE DU CONTRAT</div>
+        <div class="article-content">
+            Le présent contrat s'appliquera du {{ contract.signedAt|date('d/m/Y') }} au {{ contract.expiresAt|date('d/m/Y') }}.
+        </div>
+    </div>
+
+    <div class="article">
+        <div class="article-title">ARTICLE 3 : CONDITIONS ET OBLIGATIONS</div>
+        <div class="article-content">
+            {{ contract.terms|nl2br }}
+        </div>
+    </div>
+
+    <div class="article">
+        <div class="article-title">ARTICLE 4 : NIVEAU DE SPONSORING</div>
+        <div class="article-content">
+            Le sponsor bénéficie du niveau <strong>{{ contract.level.value }}</strong> conformément aux avantages définis 
+            pour ce niveau dans le cadre du programme de sponsoring.
+        </div>
+    </div>
+
+    <div class="article">
+        <div class="article-title">ARTICLE 5 : OBLIGATIONS DU SPONSORISÉ</div>
+        <div class="article-content">
+            Le sponsorisé s'engage à respecter toutes les obligations définies dans le présent contrat et à fournir 
+            les prestations convenues dans les délais impartis.
+        </div>
+    </div>
+
+    <div class="article">
+        <div class="article-title">ARTICLE 6 : OBLIGATIONS DU SPONSOR</div>
+        <div class="article-content">
+            Le sponsor s'engage à respecter les termes du présent contrat et à fournir les avantages convenus 
+            dans le cadre du niveau de sponsoring accordé.
+        </div>
+    </div>
+
+    <div class="signatures">
+        <div class="signature-block">
+            <div class="signature-line">
+                Le Sponsor<br>
+                {{ contract.sponsor.name }}
+            </div>
+        </div>
+        <div class="signature-block">
+            <div class="signature-line">
+                Le Sponsorisé<br>
+                {{ company.name|default('ARTEDU') }}
+            </div>
+        </div>
+    </div>
+
+    <div class="stamp">
+        <div class="stamp-company">ArtEdu</div>
+        <div class="stamp-admin">admin</div>
+        <div class="stamp-info">
+            {% if company.siret %}SIRET: {{ company.siret }}<br>{% endif %}
+            {% if company.address %}{{ company.address }}<br>{% endif %}
+            {% if company.city %}{{ company.city }}<br>{% endif %}
+            {% if company.rcs %}RCS {{ company.rcs }}{% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
+

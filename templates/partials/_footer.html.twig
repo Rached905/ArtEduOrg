@@ -1,12 +1,81 @@
 <footer class="py-4 bg-light mt-auto">
     <div class="container-fluid px-4">
+        {# Affichage des sponsors de la plateforme #}
+        {% set platform_sponsors = get_global_sponsors() %}
+        {% if platform_sponsors|length > 0 %}
+            <div class="mb-4">
+                <h6 class="text-muted mb-3 text-center">
+                    <i class="fas fa-handshake me-2"></i>Nos Sponsors Partenaires
+                </h6>
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-4">
+                    {% for sponsor in platform_sponsors %}
+                        <a href="{{ sponsor.website ? sponsor.website : '#' }}" 
+                           target="_blank" 
+                           class="sponsor-logo-link" 
+                           title="{{ sponsor.name }}"
+                           rel="noopener noreferrer">
+                            <img src="{{ asset('uploads/sponsors/' ~ sponsor.logo) }}" 
+                                 alt="{{ sponsor.name }}" 
+                                 class="sponsor-logo">
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        
         <div class="d-flex align-items-center justify-content-between small">
-            <div class="text-muted">&copy; 2023 My Symfony App</div>
+            <div class="text-muted">Copyright &copy; ARTEDU {{ "now"|date("Y") }}</div>
             <div>
-                <a href="#">Privacy Policy</a>
+                <a href="#">Politique de confidentialité</a>
                 &middot;
-                <a href="#">Terms &amp; Conditions</a>
+                <a href="#">Conditions d'utilisation</a>
             </div>
         </div>
     </div>
 </footer>
+
+<style>
+.sponsor-logo-link {
+    display: inline-block;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.sponsor-logo {
+    max-height: 60px;
+    max-width: 150px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: grayscale(30%);
+    opacity: 0.85;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.sponsor-logo-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.sponsor-logo-link:hover .sponsor-logo {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .sponsor-logo {
+        max-height: 50px;
+        max-width: 120px;
+    }
+    
+    .sponsor-logo-link {
+        padding: 6px;
+    }
+}
+</style>
