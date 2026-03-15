@@ -26,6 +26,12 @@ pipeline {
             }
         }
 
+        stage('Prepare .env') {
+            steps {
+                sh 'cp .env.test .env 2>/dev/null || cp .env.example .env'
+            }
+        }
+
         stage('Composer install') {
             steps {
                 sh 'composer install --no-interaction --prefer-dist'
@@ -42,11 +48,22 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                sh './vendor/bin/phpunit --configuration phpunit.xml.dist'
+                sh 'mkdir -p var && ./vendor/bin/phpunit --configuration phpunit.xml.dist'
             }
             post {
                 always {
                     junit allowEmptyResults: true, testResults: 'var/phpunit*.xml'
+                }
+            }
+        }
+
+        stage('SonarQube') {
+            when {
+                expression { return env.SONAR_SKIP != 'true' }
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
                 }
             }
         }

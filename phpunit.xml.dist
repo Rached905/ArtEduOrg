@@ -27,6 +27,9 @@
         <include>
             <directory suffix=".php">src</directory>
         </include>
+        <report>
+            <clover outputFile="var/clover.xml"/>
+        </report>
     </coverage>
 
     <listeners>
