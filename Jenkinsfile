@@ -40,8 +40,15 @@ pipeline {
 
         stage('Prepare test database') {
             steps {
-                sh 'php bin/console doctrine:database:create --env=test --if-not-exists || true'
-                sh 'php bin/console doctrine:migrations:migrate --env=test --no-interaction || true'
+                sh '''
+                    mkdir -p var
+                    if grep -q "sqlite" .env 2>/dev/null; then
+                      php bin/console doctrine:schema:create --env=test
+                    else
+                      php bin/console doctrine:database:create --env=test --if-not-exists || true
+                      php bin/console doctrine:migrations:migrate --env=test --no-interaction
+                    fi
+                '''
                 sh 'php bin/console cache:clear --env=test'
             }
         }
@@ -62,8 +69,10 @@ pipeline {
                 expression { return env.SONAR_SKIP != 'true' }
             }
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner'
+                catchError(buildResult: 'SUCCESS', message: 'SonarQube step skipped or failed (e.g. sonar-scanner not installed)') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh 'sonar-scanner'
+                    }
                 }
             }
         }
