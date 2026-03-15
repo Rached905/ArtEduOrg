@@ -1,11 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'php:8.2-cli'
-            args '-u root:root --entrypoint=""'
-            reuseNode true
-        }
-    }
+    agent any
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
@@ -19,19 +13,15 @@ pipeline {
     }
 
     stages {
-        stage('Install PHP extensions and Composer') {
-            steps {
-                sh '''
-                    apt-get update -qq && apt-get install -y -qq git unzip libzip-dev libicu-dev > /dev/null
-                    docker-php-ext-install -j$(nproc) zip intl pdo_mysql pdo_sqlite 2>/dev/null || true
-                    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-                '''
-            }
-        }
-
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Check environment') {
+            steps {
+                sh 'php -v && composer -V'
             }
         }
 
