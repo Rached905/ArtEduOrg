@@ -1,0 +1,878 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Vente - Admin{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .details-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .details-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .details-header h1 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .details-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .info-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .info-value {
+        font-size: 1.25rem;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .type-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .type-badge.vente {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .type-badge.ticket {
+        background-color: #198754;
+        color: white;
+    }
+
+    .type-badge.echange {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .status-badge.en-attente {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .status-badge.paye {
+        background-color: #198754;
+        color: white;
+    }
+
+    .status-badge.annule {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-indicator.en-attente {
+        background-color: #ffc107;
+        box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+    }
+
+    .status-indicator.paye {
+        background-color: #198754;
+        box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.3);
+    }
+
+    .status-indicator.annule {
+        background-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+    }
+
+    .amount-display {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #198754;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .btn-action {
+        flex: 1;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: white;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: white;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .breadcrumb {
+        background: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .breadcrumb-item a {
+        color: #667eea;
+        text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+
+    .section-divider {
+        margin: 3rem 0 2rem;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .section-title-admin {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .contact-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        border-left: 4px solid #667eea;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+
+    .vendor-card {
+        border-left-color: #0d6efd;
+    }
+
+    .buyer-card {
+        border-left-color: #28a745;
+    }
+
+    .contact-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        border: 4px solid white;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        flex-shrink: 0;
+    }
+
+    .buyer-avatar {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+
+    .contact-details {
+        flex: 1;
+    }
+
+    .contact-details h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .contact-info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .contact-info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #495057;
+        font-size: 1rem;
+    }
+
+    .contact-info-item i {
+        color: #667eea;
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .role-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .role-badge.vendor {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+    }
+
+    .role-badge.admin {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+    }
+
+    .role-badge.client {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .status-badge.active {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-badge.inactive {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .no-buyer-info {
+        text-align: center;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border: 2px dashed #dee2e6;
+        margin-bottom: 2rem;
+    }
+
+    .no-buyer-info i {
+        font-size: 3rem;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+    }
+
+    .no-buyer-info p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .payment-info-card-admin {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        border-left: 4px solid #28a745;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+
+    .payment-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .payment-info-item-admin {
+        padding: 1.25rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .payment-info-label-admin {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .payment-info-label-admin i {
+        color: #28a745;
+        font-size: 1rem;
+    }
+
+    .payment-info-value-admin {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .payment-status-badge-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .payment-status-badge-admin.paid {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .payment-status-badge-admin.pending {
+        background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+        color: #000;
+    }
+
+    .invoice-section-admin {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .btn-invoice-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 14px 28px;
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-invoice-admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        color: white;
+    }
+
+    .info-message-admin {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border-left: 4px solid #ffc107;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #856404;
+        font-weight: 500;
+    }
+
+    .info-message-admin i {
+        font-size: 1.2rem;
+        color: #ffc107;
+    }
+
+    @media (max-width: 768px) {
+        .contact-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .payment-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .info-message-admin {
+            width: 100%;
+        }
+    }
+</style>
+<script>
+function showImageModal(imageSrc, title) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: pointer;';
+    modal.innerHTML = `
+        <div style="max-width: 90%; max-height: 90%; text-align: center;">
+            <img src="${imageSrc}" alt="${title}" style="max-width: 100%; max-height: 90vh; border-radius: 8px;">
+            <p style="color: white; margin-top: 20px;">${title}</p>
+        </div>
+    `;
+    modal.onclick = () => modal.remove();
+    document.body.appendChild(modal);
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="details-container">
+    <div class="details-header">
+        <div>
+            <h1><i class="fas fa-shopping-cart me-2"></i>Détails de la Vente</h1>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ path('app_sale_index') }}"><i class="fas fa-home"></i> Ventes</a></li>
+                <li class="breadcrumb-item active">Vente #{{ sale.id }}</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="details-card">
+        {% set primaryImage = null %}
+        {% set secondaryImages = [] %}
+        {% for image in images %}
+            {% if image.isPrimary %}
+                {% set primaryImage = image %}
+            {% else %}
+                {% set secondaryImages = secondaryImages|merge([image]) %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if primaryImage or sale.image %}
+            <div class="text-center mb-4">
+                {% if primaryImage %}
+                    <img src="{{ asset(primaryImage.path) }}" alt="{{ sale.title }}" 
+                         style="max-width: 100%; max-height: 500px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; margin-bottom: 20px;"
+                         onclick="showImageModal('{{ asset(primaryImage.path) }}', '{{ sale.title }}')">
+                {% elseif sale.image %}
+                    <img src="{{ asset(sale.image) }}" alt="{{ sale.title }}" 
+                         style="max-width: 100%; max-height: 500px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; margin-bottom: 20px;"
+                         onclick="showImageModal('{{ asset(sale.image) }}', '{{ sale.title }}')">
+                {% endif %}
+                
+                {% if secondaryImages|length > 0 %}
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;">
+                        {% for image in secondaryImages %}
+                            <div style="position: relative; width: 100px; height: 100px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer;"
+                                 onclick="showImageModal('{{ asset(image.path) }}', '{{ sale.title }}')">
+                                <img src="{{ asset(image.path) }}" alt="{{ sale.title }}" 
+                                     style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="info-grid">
+            <div class="info-item" style="grid-column: 1 / -1;">
+                <div class="info-label"><i class="fas fa-heading me-2"></i>Titre</div>
+                <div class="info-value" style="font-size: 1.5rem;">{{ sale.title ?? 'Sans titre' }}</div>
+            </div>
+
+            {% if sale.description %}
+            <div class="info-item" style="grid-column: 1 / -1;">
+                <div class="info-label"><i class="fas fa-align-left me-2"></i>Description</div>
+                <div class="info-value" style="white-space: pre-wrap;">{{ sale.description }}</div>
+            </div>
+            {% endif %}
+
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-hashtag me-2"></i>ID</div>
+                <div class="info-value">#{{ sale.id }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-tag me-2"></i>Type</div>
+                <div class="info-value">
+                    {% if sale.type.value == 'vente' %}
+                        <span class="type-badge vente">
+                            <i class="fas fa-shopping-bag me-1"></i>Vente
+                        </span>
+                    {% elseif sale.type.value == 'ticket' %}
+                        <span class="type-badge ticket">
+                            <i class="fas fa-ticket-alt me-1"></i>Ticket
+                        </span>
+                    {% elseif sale.type.value == 'echange' %}
+                        <span class="type-badge echange">
+                            <i class="fas fa-exchange-alt me-1"></i>Échange
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-info-circle me-2"></i>Statut</div>
+                <div class="info-value">
+                    {% if sale.status.value == 'en attente' %}
+                        <span class="status-badge en-attente">
+                            <span class="status-indicator en-attente"></span>
+                            En attente
+                        </span>
+                    {% elseif sale.status.value == 'paye' %}
+                        <span class="status-badge paye">
+                            <span class="status-indicator paye"></span>
+                            Payé
+                        </span>
+                    {% elseif sale.status.value == 'annule' %}
+                        <span class="status-badge annule">
+                            <span class="status-indicator annule"></span>
+                            Annulé
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-money-bill-wave me-2"></i>Montant</div>
+                <div class="info-value">
+                    <span class="amount-display">
+                        {{ sale.amount ? sale.amount|number_format(2, ',', ' ') ~ ' €' : 'N/A' }}
+                    </span>
+                </div>
+            </div>
+
+            {% if sale.contactInfo %}
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-envelope me-2"></i>Contact</div>
+                <div class="info-value">{{ sale.contactInfo }}</div>
+            </div>
+            {% endif %}
+
+            {% if sale.location %}
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-map-marker-alt me-2"></i>Localisation</div>
+                <div class="info-value">{{ sale.location }}</div>
+            </div>
+            {% endif %}
+
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-calendar me-2"></i>Date de création</div>
+                <div class="info-value">
+                    {{ sale.createdAt ? sale.createdAt|date('d/m/Y à H:i') : 'N/A' }}
+                </div>
+            </div>
+
+            {% if sale.updatedAt %}
+            <div class="info-item">
+                <div class="info-label"><i class="fas fa-edit me-2"></i>Dernière modification</div>
+                <div class="info-value">
+                    {{ sale.updatedAt|date('d/m/Y à H:i') }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Informations du Vendeur #}
+        {% if sale.vendeur %}
+        <div class="section-divider"></div>
+        <h3 class="section-title-admin">
+            <i class="fas fa-user-tie me-2"></i>
+            Coordonnées du Vendeur
+        </h3>
+        <div class="contact-card vendor-card">
+            <div class="contact-avatar">
+                {{ sale.vendeur.fullname|first|upper }}
+            </div>
+            <div class="contact-details">
+                <h4>{{ sale.vendeur.fullname }}</h4>
+                <div class="contact-info-list">
+                    <div class="contact-info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span><strong>Email :</strong> {{ sale.vendeur.email }}</span>
+                    </div>
+                    {% if sale.vendeur.createdAt %}
+                    <div class="contact-info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span><strong>Membre depuis :</strong> {{ sale.vendeur.createdAt|date('d/m/Y') }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="contact-info-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span><strong>Rôle :</strong> 
+                            {% if sale.vendeur.role %}
+                                {% if sale.vendeur.role.value == 'VENDEUR' %}
+                                    <span class="role-badge vendor">Vendeur</span>
+                                {% elseif sale.vendeur.role.value == 'ADMIN' %}
+                                    <span class="role-badge admin">Administrateur</span>
+                                {% else %}
+                                    <span class="role-badge client">Client</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Non défini</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="contact-info-item">
+                        <i class="fas fa-toggle-{{ sale.vendeur.isActive ? 'on' : 'off' }}"></i>
+                        <span><strong>Statut :</strong> 
+                            {% if sale.vendeur.isActive %}
+                                <span class="status-badge active">Actif</span>
+                            {% else %}
+                                <span class="status-badge inactive">Inactif</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# Informations du Client/Acheteur #}
+        {% if sale.acheteur %}
+        <div class="section-divider"></div>
+        <h3 class="section-title-admin">
+            <i class="fas fa-user me-2"></i>
+            Coordonnées du Client (Acheteur)
+        </h3>
+        <div class="contact-card buyer-card">
+            <div class="contact-avatar buyer-avatar">
+                {{ sale.acheteur.fullname|first|upper }}
+            </div>
+            <div class="contact-details">
+                <h4>{{ sale.acheteur.fullname }}</h4>
+                <div class="contact-info-list">
+                    <div class="contact-info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span><strong>Email :</strong> {{ sale.acheteur.email }}</span>
+                    </div>
+                    {% if sale.acheteur.createdAt %}
+                    <div class="contact-info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span><strong>Membre depuis :</strong> {{ sale.acheteur.createdAt|date('d/m/Y') }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="contact-info-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span><strong>Rôle :</strong> 
+                            {% if sale.acheteur.role %}
+                                {% if sale.acheteur.role.value == 'CLIENT' or sale.acheteur.role.value == 'AGENT' %}
+                                    <span class="role-badge client">Client</span>
+                                {% elseif sale.acheteur.role.value == 'VENDEUR' %}
+                                    <span class="role-badge vendor">Vendeur</span>
+                                {% else %}
+                                    <span class="role-badge admin">Administrateur</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Non défini</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="contact-info-item">
+                        <i class="fas fa-toggle-{{ sale.acheteur.isActive ? 'on' : 'off' }}"></i>
+                        <span><strong>Statut :</strong> 
+                            {% if sale.acheteur.isActive %}
+                                <span class="status-badge active">Actif</span>
+                            {% else %}
+                                <span class="status-badge inactive">Inactif</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="section-divider"></div>
+        <div class="no-buyer-info">
+            <i class="fas fa-info-circle"></i>
+            <p>Aucun acheteur pour le moment</p>
+        </div>
+        {% endif %}
+
+        {# Informations de Paiement #}
+        {% if sale.acheteur and sale.status.value in ['vendue', 'paye', 'payer'] %}
+        <div class="section-divider"></div>
+        <h3 class="section-title-admin">
+            <i class="fas fa-credit-card me-2"></i>
+            Informations de Paiement
+        </h3>
+        <div class="payment-info-card-admin">
+            <div class="payment-info-grid">
+                <div class="payment-info-item-admin">
+                    <div class="payment-info-label-admin">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Montant payé
+                    </div>
+                    <div class="payment-info-value-admin">
+                        {{ sale.amount|number_format(2, ',', ' ') }} €
+                    </div>
+                </div>
+                <div class="payment-info-item-admin">
+                    <div class="payment-info-label-admin">
+                        <i class="fas fa-check-circle"></i>
+                        Statut du paiement
+                    </div>
+                    <div class="payment-info-value-admin">
+                        {% if sale.status.value == 'vendue' %}
+                            <span class="payment-status-badge-admin paid">
+                                <i class="fas fa-check"></i> Vendue
+                            </span>
+                        {% elseif sale.status.value == 'paye' or sale.status.value == 'payer' %}
+                            <span class="payment-status-badge-admin paid">
+                                <i class="fas fa-check-circle"></i> Payé
+                            </span>
+                        {% else %}
+                            <span class="payment-status-badge-admin pending">
+                                <i class="fas fa-clock"></i> En attente
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="payment-info-item-admin">
+                    <div class="payment-info-label-admin">
+                        <i class="fas fa-calendar-check"></i>
+                        Date d'achat
+                    </div>
+                    <div class="payment-info-value-admin">
+                        {{ sale.updatedAt ? sale.updatedAt|date('d/m/Y à H:i') : sale.createdAt|date('d/m/Y à H:i') }}
+                    </div>
+                </div>
+                <div class="payment-info-item-admin">
+                    <div class="payment-info-label-admin">
+                        <i class="fas fa-shield-alt"></i>
+                        Mode de paiement
+                    </div>
+                    <div class="payment-info-value-admin">
+                        <i class="fab fa-stripe me-2"></i>Carte bancaire (Stripe)
+                    </div>
+                </div>
+            </div>
+            {% if invoicePath is defined and invoicePath %}
+            <div class="invoice-section-admin">
+                <a href="{{ asset(invoicePath) }}" download class="btn-invoice-admin" target="_blank">
+                    <i class="fas fa-file-pdf"></i>
+                    Télécharger la Facture
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            {% if canEdit %}
+                <a href="{{ path('app_sale_edit', {'id': sale.id}) }}" class="btn-action btn-edit">
+                    <i class="fas fa-edit"></i>
+                    Modifier
+                </a>
+                <form method="post" 
+                      action="{{ path('app_sale_delete', {'id': sale.id}) }}" 
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette vente ?');"
+                      style="flex: 1; margin: 0;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sale.id) }}">
+                    <button type="submit" class="btn-action btn-delete" style="width: 100%;">
+                        <i class="fas fa-trash"></i>
+                        Supprimer
+                    </button>
+                </form>
+            {% else %}
+                <div class="info-message-admin">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Vous pouvez uniquement consulter cette vente. Seul le vendeur peut la modifier ou la supprimer.</span>
+                </div>
+            {% endif %}
+            <a href="{{ path('app_sale_index') }}" class="btn-action btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

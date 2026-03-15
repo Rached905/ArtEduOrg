@@ -5,8 +5,8 @@ namespace App\Controller;
 use App\Entity\Sponsor;
 use App\Entity\Event;
 use App\Form\SponsorType;
-use App\Repository\SponsorRepository;
 use App\Repository\SponsorContractRepository;
+use App\Repository\SponsorRepository;
 use App\Repository\SponsorshipRepository;
 use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,6 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Twig\Environment;
 
 #[Route('/sponsor')]
 final class SponsorController extends AbstractController
@@ -98,6 +101,89 @@ final class SponsorController extends AbstractController
             'recent_sponsorships' => $recentSponsorships,
             'now' => $now,
         ]);
+    }
+
+    #[Route('/notify-expiring-contracts', name: 'app_sponsor_notify_expiring_contracts', methods: ['GET'])]
+    public function notifyExpiringContracts(
+        SponsorContractRepository $sponsorContractRepository,
+        MailerInterface $mailer,
+        Environment $twig
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $days = 30;
+        $now = new \DateTimeImmutable();
+        $expirationDate = $now->modify("+{$days} days");
+
+        $expiringContracts = $sponsorContractRepository->findExpiringWithinDays($days);
+
+        if (empty($expiringContracts)) {
+            $this->addFlash('info', sprintf('Aucun contrat n\'expire dans les %d prochains jours.', $days));
+            return $this->redirectToRoute('app_sponsor_stats');
+        }
+
+        $contractsData = [];
+        foreach ($expiringContracts as $contract) {
+            $expiresAt = $contract->getExpiresAt();
+            $daysUntilExpiration = $now->diff($expiresAt)->days;
+
+            $contractsData[] = [
+                'contractNumber' => $contract->getContractNumber(),
+                'sponsor' => $contract->getSponsor(),
+                'expiresAt' => $expiresAt,
+                'daysUntilExpiration' => $daysUntilExpiration,
+                'level' => $contract->getLevel(),
+            ];
+        }
+
+        try {
+            $htmlContent = $twig->render('emails/expiring_contracts_notification.html.twig', [
+                'contracts' => $contractsData,
+                'days' => $days,
+                'periodStart' => $now,
+                'periodEnd' => $expirationDate,
+            ]);
+
+            $textContent = "Notification de Contrats Expirants\n\n";
+            $textContent .= sprintf(
+                "Nous vous informons que %d contrat(s) expirent dans les %d prochains jours.\n\n",
+                count($contractsData),
+                $days
+            );
+            $textContent .= "Détails des contrats :\n";
+            foreach ($contractsData as $contract) {
+                $textContent .= sprintf(
+                    "- %s (%s) - Expire le %s (%d jours restants)\n",
+                    $contract['contractNumber'],
+                    $contract['sponsor'] ? $contract['sponsor']->getName() : 'N/A',
+                    $contract['expiresAt']->format('d/m/Y'),
+                    $contract['daysUntilExpiration']
+                );
+            }
+
+            $email = (new Email())
+                ->from('noreply@votresite.com')
+                ->to('kacemi396@gmail.com')
+                ->subject(sprintf('⚠️ %d Contrat(s) Expirant(s) dans les %d Prochains Jours', count($contractsData), $days))
+                ->text($textContent)
+                ->html($htmlContent);
+
+            $mailer->send($email);
+
+            $this->addFlash(
+                'success',
+                sprintf(
+                    'Email de notification envoyé à %s pour %d contrat(s) expirant(s) dans les %d prochains jours.',
+                    'kacemi396@gmail.com',
+                    count($contractsData),
+                    $days
+                )
+            );
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_sponsor_stats');
     }
 
     #[Route('/', name: 'app_sponsor_index')]

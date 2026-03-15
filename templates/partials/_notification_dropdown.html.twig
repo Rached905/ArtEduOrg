@@ -1,0 +1,31 @@
+{# Dropdown content for the bell icon. Include with: notifications_path (e.g. path('app_client_notifications')) #}
+<li><div class="dropdown-header px-3 py-2 border-bottom bg-light"><span class="fw-bold small text-uppercase text-muted">Notifications</span></div></li>
+{% if notifications|length == 0 %}
+    <li><div class="px-3 py-4 text-center text-muted small">Aucune notification.</div></li>
+{% else %}
+    {% for notif in notifications %}
+    <li>
+        <div class="dropdown-item-modern d-flex flex-column px-3 py-2 {{ not notif.isRead ? 'bg-light' : '' }}" style="white-space: normal;">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+                <span class="small fw-semibold">
+                    {% if notif.type == 'purchased' %}Vous avez acheté : {{ notif.sale.title }}{% else %}Votre œuvre vendue : {{ notif.sale.title }}{% endif %}
+                </span>
+                <a href="{{ path('app_sale_details', {id: notif.sale.id}) }}" class="btn btn-sm btn-outline-primary flex-shrink-0">Voir</a>
+            </div>
+            <span class="small text-muted">{{ notif.createdAt|date('d/m/Y H:i') }}</span>
+            {% if not notif.isRead %}
+                <form method="post" action="{{ path('app_notification_mark_read', {id: notif.id}) }}" class="mt-1">
+                    <input type="hidden" name="_token" value="{{ csrf_token('notification_read') }}">
+                    <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none small">Marquer lu</button>
+                </form>
+            {% endif %}
+        </div>
+    </li>
+    {% endfor %}
+{% endif %}
+<li><hr class="dropdown-divider my-0"></li>
+<li>
+    <a class="dropdown-item-modern text-center py-2 small fw-semibold" href="{{ notifications_path }}">
+        <i class="fas fa-list me-1"></i> Voir toutes les notifications
+    </a>
+</li>

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\EventReview;
 use App\Entity\Event;
+use App\Entity\Users;
 use App\Form\EventReviewType;
 use App\Repository\EventReviewRepository;
 use App\Repository\EventRepository;
@@ -42,6 +43,12 @@ final class EventReviewController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Associer l'utilisateur connecté si disponible
+            $user = $this->getUser();
+            if ($user instanceof Users) {
+                $eventReview->setUser($user);
+            }
+            
             $entityManager->persist($eventReview);
             $entityManager->flush();
 
@@ -99,6 +106,51 @@ final class EventReviewController extends AbstractController
         }
 
         return $this->redirectToRoute('app_event_review_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/vendor/new/{eventId}', name: 'app_event_review_vendor_new', methods: ['POST'], requirements: ['eventId' => '\d+'])]
+    public function vendorNew(Request $request, int $eventId, EntityManagerInterface $entityManager, EventRepository $eventRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_VENDOR');
+        
+        $event = $eventRepository->find($eventId);
+        if (!$event) {
+            return $this->json(['success' => false, 'message' => 'Événement non trouvé.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $eventReview = new EventReview();
+        $eventReview->setEvent($event);
+        
+        // Associer l'utilisateur connecté
+        $user = $this->getUser();
+        if ($user instanceof \App\Entity\Users) {
+            $eventReview->setUser($user);
+        }
+
+        $rating = $request->request->getInt('rating');
+        $comment = $request->request->getString('comment');
+
+        if ($rating < 1 || $rating > 5) {
+            return $this->json(['success' => false, 'message' => 'La note doit être entre 1 et 5.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $eventReview->setRating($rating);
+        $eventReview->setComment($comment ?: null);
+
+        $entityManager->persist($eventReview);
+        $entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'message' => 'Votre avis a été enregistré avec succès.',
+            'review' => [
+                'id' => $eventReview->getId(),
+                'rating' => $eventReview->getRating(),
+                'comment' => $eventReview->getComment(),
+                'createdAt' => $eventReview->getCreatedAt()->format('d/m/Y H:i'),
+                'userName' => $user ? $user->getFullname() : 'Anonyme',
+            ]
+        ]);
     }
 }
 

@@ -238,7 +238,13 @@ final class EventController extends AbstractController
         // Derniers tickets vendus
         $recentTickets = $ticketRepository->findBy([], ['issuedAt' => 'DESC'], 5);
 
-        return $this->render('event/index.html.twig', [
+        // Déterminer le template selon le rôle
+        $template = 'event/index.html.twig';
+        if ($this->isGranted('ROLE_VENDOR') || $this->isGranted('ROLE_VENDEUR')) {
+            $template = 'event/index_vendor.html.twig';
+        }
+
+        return $this->render($template, [
             'events'           => $allEvents,
             'upcoming_events'  => $upcoming,
             'ongoing_events'   => $ongoing,
@@ -283,7 +289,13 @@ final class EventController extends AbstractController
             $averageRating = round($totalRating / count($reviews), 1);
         }
         
-        return $this->render('event/show.html.twig', [
+        // Déterminer le template selon le rôle
+        $template = 'event/show.html.twig';
+        if ($this->isGranted('ROLE_VENDOR') || $this->isGranted('ROLE_VENDEUR')) {
+            $template = 'event/show_vendor.html.twig';
+        }
+        
+        return $this->render($template, [
             'event' => $event,
             'reviews' => $reviews,
             'averageRating' => $averageRating,

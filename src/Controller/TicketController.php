@@ -222,7 +222,14 @@ final class TicketController extends AbstractController
         $result = $writer->write($qrCode);
         $qrSvg = $result->getString();
 
-        return $this->render('ticket/show.html.twig', [
+        // Déterminer le template selon le rôle de l'utilisateur connecté
+        $user = $this->getUser();
+        $template = 'ticket/show.html.twig';
+        if ($user && $user->getRole() && in_array($user->getRole()->value, ['CLIENT', 'AGENT'])) {
+            $template = 'ticket/show_client.html.twig';
+        }
+        
+        return $this->render($template, [
             'ticket' => $ticket,
             'qrSvg' => $qrSvg,
             'qrCodeTargetUrl' => $scanUrl,
@@ -232,11 +239,12 @@ final class TicketController extends AbstractController
     #[Route('/{id}', name: 'app_ticket_show', methods: ['GET'])]
     public function show(Ticket $ticket): Response
     {
-        // Vérifier que l'utilisateur est admin OU que c'est son propre ticket
+        // Vérifier que l'utilisateur est admin, vendeur, ou propriétaire du ticket
         $user = $this->getUser();
         $isOwner = $user && $user->getEmail() === $ticket->getBuyerEmail();
+        $isVendor = $this->isGranted('ROLE_VENDOR') || $this->isGranted('ROLE_VENDEUR');
         
-        if (!$isOwner && !$this->isGranted('ROLE_ADMIN')) {
+        if (!$isOwner && !$this->isGranted('ROLE_ADMIN') && !$isVendor) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à ce ticket.');
         }
         
@@ -257,7 +265,15 @@ final class TicketController extends AbstractController
         $writer = new SvgWriter();
         $qrSvg = $writer->write($qrCode)->getString();
 
-        return $this->render('ticket/show.html.twig', [
+        // Déterminer le template selon le rôle
+        $template = 'ticket/show.html.twig';
+        if ($user && $user->getRole() && in_array($user->getRole()->value, ['CLIENT', 'AGENT'])) {
+            $template = 'ticket/show_client.html.twig';
+        } elseif ($isVendor || ($this->isGranted('ROLE_VENDOR') || $this->isGranted('ROLE_VENDEUR'))) {
+            $template = 'ticket/show_vendor.html.twig';
+        }
+        
+        return $this->render($template, [
             'ticket' => $ticket,
             'qrSvg' => $qrSvg,
             'qrCodeTargetUrl' => $qrCodeTargetUrl,

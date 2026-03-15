@@ -19,13 +19,28 @@
                         <div class="user-avatar-hero">{{ app.user.fullname|first|upper }}</div>
                         <p class="user-greeting">Bonjour <strong>{{ app.user.fullname }}</strong> !</p>
                     </div>
-                    <a href="{{ path('app_client_evenements') }}" class="btn btn-hero-modern">
+                    <div class="hero-actions">
+                        <a href="#nos-oeuvres" class="btn btn-hero-modern btn-primary-modern">
+                            <span>Explorer Nos Oeuvres</span>
+                            <i class="fas fa-palette ms-2"></i>
+                        </a>
+                        <a href="{{ path('app_client_evenements') }}" class="btn btn-hero-modern btn-outline-modern">
+                            <span>Explorer les événements</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="hero-actions animate-fade-in-delay-3">
+                    <a href="#nos-oeuvres" class="btn btn-hero-modern btn-primary-modern">
+                        <span>Explorer Nos Oeuvres</span>
+                        <i class="fas fa-palette ms-2"></i>
+                    </a>
+                    <a href="{{ path('app_client_evenements') }}" class="btn btn-hero-modern btn-outline-modern">
                         <span>Explorer les événements</span>
                         <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
-            {% else %}
-                
             {% endif %}
         </div>
         
@@ -42,6 +57,86 @@
             <div class="mouse">
                 <div class="wheel"></div>
             </div>
+        </div>
+    </section>
+
+    {# Nos Oeuvres Section #}
+    <section id="nos-oeuvres" class="oeuvres-section-modern">
+        <div class="container">
+            <div class="section-header-modern">
+                <span class="section-badge">GALERIE</span>
+                <h2 class="section-title-modern">Nos Oeuvres</h2>
+                <p class="section-subtitle-modern">Découvrez notre collection d'œuvres d'art uniques</p>
+            </div>
+            
+            {% if sales|length > 0 %}
+                <div class="row g-4">
+                    {% for sale in sales %}
+                        {% set primaryImage = sale.getPrimaryImage() %}
+                        <div class="col-md-4 col-lg-3">
+                            <div class="artwork-card-modern">
+                                <div class="artwork-image-modern">
+                                    {% if primaryImage %}
+                                        <img src="{{ asset(primaryImage.path) }}" alt="{{ sale.title }}" class="artwork-img">
+                                    {% elseif sale.image %}
+                                        <img src="{{ asset(sale.image) }}" alt="{{ sale.title }}" class="artwork-img">
+                                    {% else %}
+                                        <div class="artwork-placeholder-modern">
+                                            <i class="fas fa-image fa-3x"></i>
+                                        </div>
+                                    {% endif %}
+                                    {% if sale.status.value == 'disponible' or sale.status.value == 'en attente' %}
+                                        <div class="artwork-badge-modern available">Disponible</div>
+                                    {% elseif sale.status.value == 'vendue' %}
+                                        <div class="artwork-badge-modern sold">Vendue</div>
+                                    {% endif %}
+                                    <div class="artwork-overlay">
+                                        <a href="{{ path('app_sale_details', {id: sale.id}) }}" class="btn-view-artwork">
+                                            <i class="fas fa-eye"></i> Voir détails
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="artwork-content-modern">
+                                    <h4 class="artwork-title-modern">{{ sale.title }}</h4>
+                                    {% if sale.description %}
+                                        <p class="artwork-description-modern">{{ sale.description|slice(0, 80) }}{% if sale.description|length > 80 %}...{% endif %}</p>
+                                    {% endif %}
+                                    <div class="artwork-info-modern">
+                                        {% if sale.type %}
+                                            <span class="artwork-type-badge">
+                                                <i class="fas fa-tag"></i> {{ sale.type.value }}
+                                            </span>
+                                        {% endif %}
+                                        {% if sale.vendeur %}
+                                            <span class="artwork-artist">
+                                                <i class="fas fa-user"></i> {{ sale.vendeur.fullname }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="artwork-footer-modern">
+                                        <div class="artwork-price-modern">
+                                            {% if sale.amount %}
+                                                {{ sale.amount|number_format(0, ',', ' ') }} €
+                                            {% else %}
+                                                Prix sur demande
+                                            {% endif %}
+                                        </div>
+                                        <a href="{{ path('app_sale_details', {id: sale.id}) }}" class="btn-artwork-modern">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-palette fa-4x text-muted mb-3"></i>
+                    <h3 class="text-muted">Aucune œuvre disponible pour le moment</h3>
+                    <p class="text-muted">Revenez bientôt pour découvrir de nouvelles créations !</p>
+                </div>
+            {% endif %}
         </div>
     </section>
 
@@ -1071,6 +1166,209 @@
     to { opacity: 1; }
 }
 
+/* Nos Oeuvres Section - Modern */
+.oeuvres-section-modern {
+    padding: 100px 0;
+    background: white;
+    scroll-margin-top: 80px;
+}
+
+.artwork-card-modern {
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    transition: all 0.4s ease;
+    border: 2px solid transparent;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.artwork-card-modern:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 60px rgba(233, 69, 96, 0.2);
+    border-color: var(--accent-color);
+}
+
+.artwork-image-modern {
+    position: relative;
+    height: 250px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e8ecf1 100%);
+    overflow: hidden;
+}
+
+.artwork-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.artwork-card-modern:hover .artwork-img {
+    transform: scale(1.1);
+}
+
+.artwork-placeholder-modern {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+}
+
+.artwork-badge-modern {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.artwork-badge-modern.available {
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+}
+
+.artwork-badge-modern.sold {
+    background: rgba(158, 158, 158, 0.9);
+    color: white;
+}
+
+.artwork-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.artwork-card-modern:hover .artwork-overlay {
+    opacity: 1;
+}
+
+.btn-view-artwork {
+    padding: 12px 30px;
+    background: white;
+    color: var(--accent-color);
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-view-artwork:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    color: var(--accent-color);
+}
+
+.artwork-content-modern {
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.artwork-title-modern {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.artwork-description-modern {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    flex: 1;
+}
+
+.artwork-info-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.artwork-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(233, 69, 96, 0.1);
+    color: var(--accent-color);
+    border-radius: 15px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.artwork-artist {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.artwork-artist i {
+    color: var(--accent-color);
+}
+
+.artwork-footer-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.artwork-price-modern {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent-color);
+}
+
+.btn-artwork-modern {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+}
+
+.btn-artwork-modern:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+    color: white;
+}
+
+/* Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero-title {
@@ -1091,6 +1389,16 @@
     
     .stat-number-modern {
         font-size: 2.5rem;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .btn-hero-modern {
+        width: 100%;
+        justify-content: center;
     }
 }
 </style>
@@ -1130,6 +1438,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.5 });
     
     counters.forEach(counter => observer.observe(counter));
+});
+
+// Smooth scroll to section
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#' && href.startsWith('#')) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    });
 });
 </script>
 {% endblock %}

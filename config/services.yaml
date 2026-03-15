@@ -4,6 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    stripe_public_key: '%env(default:stripe_public_key_default:STRIPE_PUBLIC_KEY)%'
+    stripe_public_key_default: ''
+    stripe_secret_key_default: ''
 
 services:
     # default configuration for services in *this* file
@@ -27,3 +30,24 @@ services:
     App\Service\FileUploader:
         arguments:
             $targetDirectory: '%kernel.project_dir%/public/uploads/sponsors'
+    
+    # Configuration des services pour le module Sale
+    App\Service\SaleImageUploader:
+        arguments:
+            $targetDirectory: '%kernel.project_dir%/public/uploads/sales'
+            $slugger: '@Symfony\Component\String\Slugger\SluggerInterface'
+
+    App\Service\PaymentService:
+        arguments:
+            $stripeSecretKey: '%env(default:stripe_secret_key_default:STRIPE_SECRET_KEY)%'
+
+    App\Service\InvoiceService:
+        arguments:
+            $kernelProjectDir: '%kernel.project_dir%'
+
+    App\Service\Sale\SaleMailerService:
+        arguments:
+            $mailer: '@Symfony\Component\Mailer\MailerInterface'
+            $twig: '@Twig\Environment'
+            $fromEmail: '%env(MAILER_FROM)%'
+            $parameterBag: '@parameter_bag'

@@ -75,6 +75,9 @@ security:
         - { path: ^/sponsor/contract/[0-9]+/delete, roles: ROLE_ADMIN }
         - { path: ^/sponsorship/[0-9]+/edit, roles: ROLE_ADMIN }
         - { path: ^/sponsorship/[0-9]+/delete, roles: ROLE_ADMIN }
+        # Admin : profil et paramètres de l'application
+        - { path: ^/admin/profile, roles: ROLE_ADMIN }
+        - { path: ^/admin/parametres, roles: ROLE_ADMIN }
         # Accès public pour les listes et détails (après les routes spécifiques)
         - { path: ^/sponsor/contract, roles: PUBLIC_ACCESS }
         - { path: ^/sponsorship, roles: PUBLIC_ACCESS }

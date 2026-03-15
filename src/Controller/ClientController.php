@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Repository\EventRepository;
+use App\Repository\SaleFavoriteRepository;
+use App\Repository\SaleRepository;
 use App\Repository\TicketRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ClientController extends AbstractController
 {
     #[Route('/client', name: 'app_client')]
-    public function index(EventRepository $eventRepository): Response
+    public function index(EventRepository $eventRepository, SaleRepository $saleRepository): Response
     {
         // Récupérer l'utilisateur connecté
         $user = $this->getUser();
@@ -34,10 +37,14 @@ final class ClientController extends AbstractController
             }
         }
 
+        // Récupérer toutes les ventes avec les disponibles en premier
+        $sales = $saleRepository->findAllAvailableFirst();
+
         return $this->render('client/index.html.twig', [
             'user' => $user,
             'upcoming_events' => array_slice($upcomingEvents, 0, 6),
             'ongoing_events' => array_slice($ongoingEvents, 0, 6),
+            'sales' => $sales,
         ]);
     }
 
@@ -72,7 +79,7 @@ final class ClientController extends AbstractController
     }
 
     #[Route('/client/mes-achats', name: 'app_client_mes_achats')]
-    public function mesAchats(TicketRepository $ticketRepository): Response
+    public function mesAchats(TicketRepository $ticketRepository, SaleRepository $saleRepository): Response
     {
         // Vérifier que l'utilisateur est connecté
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -88,16 +95,29 @@ final class ClientController extends AbstractController
             );
         }
 
+        // Récupérer les œuvres achetées par l'utilisateur
+        $purchasedSales = [];
+        if ($user instanceof Users) {
+            $purchasedSales = $saleRepository->findByAcheteur($user);
+        }
+
         return $this->render('client/mes_achats.html.twig', [
             'tickets' => $tickets,
+            'purchasedSales' => $purchasedSales,
         ]);
     }
 
     #[Route('/client/mes-favoris', name: 'app_client_favoris')]
-    public function mesFavoris(): Response
+    public function mesFavoris(SaleFavoriteRepository $saleFavoriteRepository): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $this->getUser();
+        $favoris = $user instanceof \App\Entity\Users
+            ? $saleFavoriteRepository->findSalesByUser($user)
+            : [];
 
-        return $this->render('client/favoris.html.twig');
+        return $this->render('client/favoris.html.twig', [
+            'favoris' => $favoris,
+        ]);
     }
 }

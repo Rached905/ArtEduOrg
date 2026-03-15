@@ -94,9 +94,16 @@
                 <h1><i class="fas fa-handshake me-2"></i>Statistiques du Sponsoring</h1>
                 <p class="mb-0">Vue d'ensemble de votre activité de sponsoring</p>
             </div>
-            <span class="badge bg-light text-dark px-3 py-2">
-                <i class="far fa-calendar-alt me-2"></i>{{ "now"|date("d/m/Y") }}
-            </span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-dark px-3 py-2 me-2">
+                    <i class="far fa-calendar-alt me-2"></i>{{ "now"|date("d/m/Y") }}
+                </span>
+                <a href="{{ path('app_sponsor_notify_expiring_contracts') }}"
+                   class="btn btn-warning btn-sm">
+                    <i class="fas fa-envelope-open-text me-1"></i>
+                    Envoyer notification contrats expirants
+                </a>
+            </div>
         </div>
     </div>
 

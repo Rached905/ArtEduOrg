@@ -16,10 +16,10 @@
         <div class="star-rating-container">
             <div class="star-rating" id="starRating">
                 {% for i in 1..5 %}
-                    <i class="far fa-star star-icon" data-rating="{{ i }}" style="font-size: 2rem; color: #ffc107; cursor: pointer; margin-right: 5px;"></i>
+                    <i class="far fa-star star-icon" data-rating="{{ i }}" style="font-size: 2rem; color: #ffc107; cursor: pointer; margin-right: 5px; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;" role="button" tabindex="0" aria-label="Noter {{ i }} étoile{{ i > 1 ? 's' : '' }}"></i>
                 {% endfor %}
             </div>
-            {{ form_widget(form.rating, {'attr': {'class': 'd-none'}}) }}
+            {{ form_widget(form.rating, {'attr': {'class': 'd-none', 'id': 'rating-input'}}) }}
             <div class="invalid-feedback d-block">
                 {{ form_errors(form.rating) }}
             </div>
@@ -90,59 +90,116 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelectorAll('.star-icon');
-    const ratingInput = document.querySelector('input[name="{{ form.rating.vars.full_name }}"]');
-    const currentRating = ratingInput && ratingInput.value ? parseInt(ratingInput.value) : 0;
+(function() {
+    'use strict';
     
-    // Initialize stars based on current rating
-    if (currentRating > 0) {
-        updateStars(currentRating);
-    }
-    
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            if (ratingInput) {
-                ratingInput.value = rating;
+    function initStarRating() {
+        const starContainer = document.getElementById('starRating');
+        if (!starContainer) {
+            console.warn('Star rating container not found');
+            return;
+        }
+        
+        const stars = starContainer.querySelectorAll('.star-icon');
+        if (stars.length === 0) {
+            console.warn('No stars found');
+            return;
+        }
+        
+        // Trouver le champ input de rating - plusieurs méthodes pour être sûr
+        let ratingInput = document.getElementById('rating-input');
+        if (!ratingInput) {
+            ratingInput = document.querySelector('input[name="{{ form.rating.vars.full_name }}"]');
+        }
+        if (!ratingInput) {
+            // Essayer avec un sélecteur plus générique
+            ratingInput = document.querySelector('input[type="number"][name*="rating"]');
+        }
+        if (!ratingInput) {
+            // Dernière tentative : chercher dans le formulaire
+            const form = starContainer.closest('form');
+            if (form) {
+                ratingInput = form.querySelector('input[type="number"]');
             }
-            updateStars(rating);
+        }
+        
+        if (!ratingInput) {
+            console.error('Rating input field not found');
+            return;
+        }
+        
+        // Initialiser les étoiles selon la valeur actuelle
+        const currentRating = ratingInput.value ? parseInt(ratingInput.value) : 0;
+        if (currentRating > 0) {
+            updateStars(stars, currentRating);
+        }
+        
+        // Ajouter les événements sur chaque étoile
+        stars.forEach((star, index) => {
+            const rating = index + 1; // 1-based rating
+            
+            // Click event
+            star.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                ratingInput.value = rating;
+                ratingInput.dispatchEvent(new Event('change', { bubbles: true }));
+                updateStars(stars, rating);
+                // Retirer l'erreur de validation si présente
+                const errorElement = starContainer.closest('.mb-3').querySelector('.invalid-feedback');
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            // Support pour le clavier (accessibilité)
+            star.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    ratingInput.value = rating;
+                    ratingInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    updateStars(stars, rating);
+                }
+            });
+            
+            // Mouse enter (hover)
+            star.addEventListener('mouseenter', function() {
+                highlightStars(stars, rating);
+            });
         });
         
-        star.addEventListener('mouseenter', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            highlightStars(rating);
-        });
-    });
-    
-    document.getElementById('starRating').addEventListener('mouseleave', function() {
-        const currentRating = ratingInput && ratingInput.value ? parseInt(ratingInput.value) : 0;
-        if (currentRating > 0) {
-            updateStars(currentRating);
-        } else {
-            clearStars();
-        }
-    });
-    
-    function updateStars(rating) {
-        stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.add('filled', 'active');
-                star.classList.remove('far');
-                star.classList.add('fas');
+        // Mouse leave sur le conteneur
+        starContainer.addEventListener('mouseleave', function() {
+            const currentValue = ratingInput.value ? parseInt(ratingInput.value) : 0;
+            if (currentValue > 0) {
+                updateStars(stars, currentValue);
             } else {
-                star.classList.remove('filled', 'active');
-                star.classList.remove('fas');
-                star.classList.add('far');
+                clearStars(stars);
             }
         });
     }
     
-    function highlightStars(rating) {
+    function updateStars(stars, rating) {
         stars.forEach((star, index) => {
-            if (index < rating) {
+            const starRating = index + 1;
+            if (starRating <= rating) {
+                star.classList.remove('far');
+                star.classList.add('fas', 'filled', 'active');
                 star.style.color = '#ffc107';
-                star.style.transform = 'scale(1.1)';
+            } else {
+                star.classList.remove('fas', 'filled', 'active');
+                star.classList.add('far');
+                star.style.color = '#ffc107';
+            }
+        });
+    }
+    
+    function highlightStars(stars, rating) {
+        stars.forEach((star, index) => {
+            const starRating = index + 1;
+            if (starRating <= rating) {
+                star.style.color = '#ffc107';
+                star.style.transform = 'scale(1.2)';
             } else {
                 star.style.color = '#ddd';
                 star.style.transform = 'scale(1)';
@@ -150,16 +207,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function clearStars() {
+    function clearStars(stars) {
         stars.forEach(star => {
-            star.classList.remove('filled', 'active');
-            star.classList.remove('fas');
+            star.classList.remove('fas', 'filled', 'active');
             star.classList.add('far');
             star.style.color = '#ffc107';
             star.style.transform = 'scale(1)';
         });
     }
-});
+    
+    // Initialiser quand le DOM est prêt
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initStarRating);
+    } else {
+        // DOM déjà chargé
+        initStarRating();
+    }
+})();
 </script>
 
 

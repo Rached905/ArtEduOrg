@@ -1,0 +1,13 @@
+{% extends 'basev.html.twig' %}
+
+{% block title %}Notifications - ArtEduOrg{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <div class="page-header mt-4 mb-4">
+        <h1 class="page-title"><i class="fas fa-bell"></i> Notifications</h1>
+        <p class="text-muted">Vos ventes et activités récentes.</p>
+    </div>
+    {% include 'partials/_notification_list.html.twig' with { notifications: notifications } %}
+</div>
+{% endblock %}

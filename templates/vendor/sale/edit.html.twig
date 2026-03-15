@@ -1,0 +1,443 @@
+{% extends 'basev.html.twig' %}
+
+{% block title %}Modifier ma Vente - Vendeur{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .form-container {
+        padding: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .page-header h1 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .btn-back-top {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back-top:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        color: white;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .form-header h2 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 10px;
+        font-size: 1.8rem;
+    }
+
+    .form-header p {
+        color: #718096;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #2d3748;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-group label .text-danger {
+        color: #dc3545;
+        font-weight: bold;
+        margin-left: 3px;
+    }
+
+    .form-group select,
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="email"],
+    .form-group input[type="tel"],
+    .form-group textarea,
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 15px;
+        color: #2d3748;
+        background-color: #f7fafc;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #667eea;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .form-group input[type="file"] {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .form-group input[type="file"]::-webkit-file-upload-button {
+        padding: 8px 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 10px;
+        font-weight: 600;
+    }
+
+    .form-group input[type="file"]::-webkit-file-upload-button:hover {
+        background: #5568d3;
+    }
+
+    .form-errors {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 10px 12px;
+        background-color: #fee;
+        border-left: 3px solid #dc3545;
+        border-radius: 4px;
+    }
+
+    .form-errors::before {
+        content: "⚠";
+        font-size: 16px;
+    }
+
+    .form-group:has(.form-errors) input,
+    .form-group:has(.form-errors) select,
+    .form-group:has(.form-errors) textarea {
+        border-color: #dc3545 !important;
+        background-color: #fff5f5;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 30px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        color: white;
+    }
+
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-card {
+            padding: 30px 20px;
+        }
+
+        .form-container {
+            padding: 1rem;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+
+    .file-info {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #718096;
+    }
+
+    .image-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .image-preview {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f7fafc;
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-container">
+    <div class="page-header">
+        <h1><i class="fas fa-edit"></i> Modifier mon Œuvre</h1>
+        <a href="{{ path('app_sale_show', {id: sale.id}) }}" class="btn-back-top">
+            <i class="fas fa-arrow-left"></i>
+            Retour aux détails
+        </a>
+    </div>
+
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Modifier les informations de votre œuvre</h2>
+            <p>Mettez à jour les détails de votre création #{{ sale.id }}</p>
+        </div>
+
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'sale-form'}}) }}
+
+        <div class="form-group">
+            {{ form_label(form.type, 'Type de vente') }}
+            <span class="text-danger">*</span>
+            {{ form_widget(form.type, {
+                'attr': {'class': 'form-control', 'required': 'required'}
+            }) }}
+            {% if form.type.vars.errors|length > 0 %}
+                <div class="form-errors">
+                    {% for error in form.type.vars.errors %}
+                        <div>{{ error.message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.title, 'Titre') }}
+            <span class="text-danger">*</span>
+            {{ form_widget(form.title, {
+                'attr': {'class': 'form-control', 'required': 'required', 'placeholder': 'Ex: Tableau d\'art moderne'}
+            }) }}
+            {% if form.title.vars.errors|length > 0 %}
+                <div class="form-errors">
+                    {% for error in form.title.vars.errors %}
+                        <div>{{ error.message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.description, 'Description') }}
+            {{ form_widget(form.description, {
+                'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Description détaillée du produit...'}
+            }) }}
+            {% if form.description.vars.errors|length > 0 %}
+                <div class="form-errors">
+                    {% for error in form.description.vars.errors %}
+                        <div>{{ error.message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.amount, 'Montant (€)') }}
+                {{ form_widget(form.amount, {
+                    'attr': {'class': 'form-control', 'step': '0.01', 'min': '0', 'placeholder': '0.00'}
+                }) }}
+                {% if form.amount.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {% for error in form.amount.vars.errors %}
+                            <div>{{ error.message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.contactInfo, 'Contact') }}
+                {{ form_widget(form.contactInfo, {
+                    'attr': {'class': 'form-control', 'placeholder': 'exemple@email.com ou +33 6 12 34 56 78'}
+                }) }}
+                {% if form.contactInfo.vars.errors|length > 0 %}
+                    <div class="form-errors">
+                        {% for error in form.contactInfo.vars.errors %}
+                            <div>{{ error.message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.location, 'Localisation') }}
+            {{ form_widget(form.location, {
+                'attr': {'class': 'form-control', 'placeholder': 'Ville, Adresse...'}
+            }) }}
+            {% if form.location.vars.errors|length > 0 %}
+                <div class="form-errors">
+                    {% for error in form.location.vars.errors %}
+                        <div>{{ error.message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.image, 'Image principale (optionnel)') }}
+            {{ form_widget(form.image, {
+                'attr': {'class': 'form-control', 'accept': 'image/*'}
+            }) }}
+            {% if form.image.vars.errors|length > 0 %}
+                <div class="form-errors">
+                    {% for error in form.image.vars.errors %}
+                        <div>{{ error.message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if sale.image %}
+                <div class="image-preview-container">
+                    <div class="image-preview">
+                        <img src="{{ asset(sale.image) }}" alt="Image principale actuelle">
+                    </div>
+                </div>
+            {% endif %}
+            <div class="file-info">
+                <small>Formats acceptés : JPEG, PNG, GIF, WebP (max 5MB)</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.images, 'Galerie d\'images (jusqu\'à 5 images)') }}
+            {{ form_widget(form.images, {
+                'attr': {'class': 'form-control', 'accept': 'image/*', 'multiple': 'multiple'}
+            }) }}
+            {% if form.images.vars.errors|length > 0 %}
+                <div class="form-errors">
+                    {% for error in form.images.vars.errors %}
+                        <div>{{ error.message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if images|length > 0 %}
+                <div class="image-preview-container">
+                    {% for image in images %}
+                        <div class="image-preview">
+                            <img src="{{ asset(image.path) }}" alt="Image de la galerie">
+                            {% if image.isPrimary %}
+                                <div style="position: absolute; top: 5px; right: 5px; background: #198754; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 600;">
+                                    Principale
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="file-info">
+                <small>Vous pouvez sélectionner jusqu'à 5 images. Formats acceptés : JPEG, PNG, GIF, WebP (max 5MB par image)</small>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i>
+            {{ button_label|default('Mettre à jour') }}
+        </button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+

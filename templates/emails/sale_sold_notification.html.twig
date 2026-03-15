@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .success-badge {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .sale-details {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .buyer-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .buyer-info h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .amount-highlight {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            border-top: 1px solid #e9ecef;
+        }
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🎉 Votre Œuvre a été Vendue !</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour <strong>{% if sale.vendeur %}{{ sale.vendeur.fullname }}{% else %}Vendeur{% endif %}</strong>,</p>
+            
+            <p>Excellente nouvelle ! Votre œuvre a été vendue avec succès.</p>
+            
+            <div class="success-badge">✓ Vente Confirmée</div>
+            
+            <h2>Détails de la vente :</h2>
+            
+            <div class="sale-details">
+                <div class="detail-row">
+                    <span class="detail-label">Œuvre :</span>
+                    <span class="detail-value"><strong>{{ sale.title }}</strong></span>
+                </div>
+                {% if sale.description %}
+                <div class="detail-row">
+                    <span class="detail-label">Description :</span>
+                    <span class="detail-value">{{ sale.description|slice(0, 100) }}{% if sale.description|length > 100 %}...{% endif %}</span>
+                </div>
+                {% endif %}
+                <div class="detail-row">
+                    <span class="detail-label">Type :</span>
+                    <span class="detail-value">{{ sale.type.value|capitalize }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Prix de vente :</span>
+                    <span class="detail-value amount-highlight">{{ amount|number_format(2, ',', ' ') }} €</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date de vente :</span>
+                    <span class="detail-value">{{ "now"|date('d/m/Y à H:i') }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Statut :</span>
+                    <span class="detail-value"><strong style="color: #28a745;">Vendue</strong></span>
+                </div>
+                {% if paymentIntentId %}
+                <div class="detail-row">
+                    <span class="detail-label">ID Transaction :</span>
+                    <span class="detail-value" style="font-family: monospace; font-size: 12px;">{{ paymentIntentId }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if sale.acheteur %}
+            <div class="buyer-info">
+                <h3>👤 Informations de l'Acheteur</h3>
+                <p><strong>Nom :</strong> {{ sale.acheteur.fullname ?? 'N/A' }}</p>
+                <p><strong>Email :</strong> {{ sale.acheteur.email ?? 'N/A' }}</p>
+                {% if sale.acheteur.createdAt %}
+                <p><strong>Membre depuis :</strong> {{ sale.acheteur.createdAt|date('d/m/Y') }}</p>
+                {% endif %}
+            </div>
+            {% elseif buyerName and buyerEmail %}
+            <div class="buyer-info">
+                <h3>👤 Informations de l'Acheteur</h3>
+                <p><strong>Nom :</strong> {{ buyerName }}</p>
+                <p><strong>Email :</strong> {{ buyerEmail }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="info-box">
+                <strong>💡 Important :</strong> Votre œuvre a été automatiquement désactivée de la plateforme. Vous pouvez la consulter dans votre section "Mes Ventes" pour voir les détails complets.
+            </div>
+            
+            <p>Le paiement a été traité avec succès via Stripe. Les fonds seront transférés selon les conditions de votre compte vendeur.</p>
+            
+            <p>Merci d'avoir utilisé ArtMarket pour vendre votre œuvre !</p>
+            
+            <p>Cordialement,<br><strong>L'équipe ArtMarket</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>Cet email a été envoyé automatiquement suite à la vente de votre œuvre sur ArtMarket.</p>
+            <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+        </div>
+    </div>
+</body>
+</html>
+

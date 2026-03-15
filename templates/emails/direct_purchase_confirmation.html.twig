@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #e94560 0%, #d63850 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .success-badge {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .sale-details {
+            background: #f8f9fa;
+            border-left: 4px solid #e94560;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .vendor-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .vendor-info h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .invoice-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            border-top: 1px solid #e9ecef;
+        }
+        .amount-highlight {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e94560;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>✅ Confirmation d'Achat</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour <strong>{{ clientName }}</strong>,</p>
+            
+            <p>Vous avez acheté une œuvre sur ArtEduOrg. Nous vous confirmons que votre achat a été enregistré et payé avec succès.</p>
+            
+            <div class="success-badge">✓ Paiement Confirmé</div>
+            
+            <h2>Détails de votre achat :</h2>
+            
+            <div class="sale-details">
+                <div class="detail-row">
+                    <span class="detail-label">Œuvre :</span>
+                    <span class="detail-value"><strong>{{ sale.title }}</strong></span>
+                </div>
+                {% if sale.description %}
+                <div class="detail-row">
+                    <span class="detail-label">Description :</span>
+                    <span class="detail-value">{{ sale.description|slice(0, 100) }}{% if sale.description|length > 100 %}...{% endif %}</span>
+                </div>
+                {% endif %}
+                <div class="detail-row">
+                    <span class="detail-label">Type :</span>
+                    <span class="detail-value">{{ sale.type.value|capitalize }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Montant payé :</span>
+                    <span class="detail-value amount-highlight">{{ amount|number_format(2, ',', ' ') }} €</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date d'achat :</span>
+                    <span class="detail-value">{{ "now"|date('d/m/Y à H:i') }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Statut :</span>
+                    <span class="detail-value"><strong style="color: #28a745;">Vendue</strong></span>
+                </div>
+            </div>
+            
+            {% if sale.vendeur %}
+            <div class="vendor-info">
+                <h3>📧 Coordonnées du Vendeur</h3>
+                <p><strong>Nom :</strong> {{ sale.vendeur.fullname ?? 'N/A' }}</p>
+                <p><strong>Email :</strong> {{ sale.vendeur.email ?? 'N/A' }}</p>
+                {% if sale.vendeur.createdAt %}
+                <p><strong>Membre depuis :</strong> {{ sale.vendeur.createdAt|date('d/m/Y') }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="invoice-note">
+                <strong>📄 Facture :</strong> Votre facture PDF est jointe à cet email. Vous pouvez la télécharger et la conserver pour vos archives.
+            </div>
+            
+            <p>Vous pouvez retrouver cette œuvre dans votre section <strong>"Mes Achats"</strong> sur la plateforme.</p>
+            
+            <p>Merci pour votre confiance !</p>
+            
+            <p>Cordialement,<br><strong>L'équipe ArtEduOrg</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>Cet email a été envoyé automatiquement suite à votre achat sur ArtEduOrg.</p>
+            <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+        </div>
+    </div>
+</body>
+</html>
+

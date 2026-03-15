@@ -2,18 +2,157 @@
 
 {% block title %}Gestion des Événements{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Style pour le bouton "Nouvel événement" */
+        .btn-add {
+            background: linear-gradient(135deg, #e94560 0%, #d63850 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+        
+        .btn-add:hover {
+            background: linear-gradient(135deg, #d63850 0%, #c22d42 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+        }
+        
+        .btn-add:active {
+            transform: translateY(0);
+        }
+        
+        .btn-add i {
+            font-size: 1.1em;
+        }
+
+        /* Style pour la colonne Actions */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-icon i {
+            font-size: 1rem;
+        }
+
+        /* Responsive pour les actions */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            
+            .btn-icon {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Style pour le page-header */
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            color: #e94560;
+        }
+
+        /* Style pour la carte du tableau */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-card h4 {
+            color: #2d3436;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Amélioration du tableau */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
 <!-- Flash Messages -->
 {% for message in app.flashes('success') %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="mdi mdi-check-circle"></i> {{ message }}
+        <i class="fas fa-check-circle"></i> {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 {% endfor %}
 
 {% for message in app.flashes('error') %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="mdi mdi-alert-circle"></i> {{ message }}
+        <i class="fas fa-exclamation-circle"></i> {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 {% endfor %}
@@ -141,18 +280,29 @@
                                 <td>{{ event.capacity }}</td>
                                 <td>{{ event.price ? event.price ~ ' €' : 'Gratuit' }}</td>
                                 <td>
-                                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-sm btn-info btn-icon">
-                                        <i class="mdi mdi-eye"></i>
-                                    </a>
-                                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-sm btn-primary btn-icon">
-                                        <i class="mdi mdi-pencil"></i>
-                                    </a>
-                                    <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');" style="display: inline-block;">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-                                        <button type="submit" class="btn btn-sm btn-danger btn-icon">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </form>
+                                    <div class="action-buttons">
+                                        <a href="{{ path('app_event_show', {'id': event.id}) }}" 
+                                           class="btn btn-sm btn-info btn-icon" 
+                                           title="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_event_edit', {'id': event.id}) }}" 
+                                           class="btn btn-sm btn-primary btn-icon" 
+                                           title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" 
+                                              action="{{ path('app_event_delete', {'id': event.id}) }}" 
+                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');" 
+                                              style="display: inline-block; margin: 0;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-danger btn-icon" 
+                                                    title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}

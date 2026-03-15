@@ -42,7 +42,7 @@ class NotifyExpiringContractsCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Envoyer les notifications par email. Spécifiez l\'adresse email ou utilisez "admin" pour l\'admin par défaut',
-                false
+                'admin'
             )
             ->addOption(
                 'from',
@@ -110,8 +110,8 @@ class NotifyExpiringContractsCommand extends Command
         if ($emailOption !== false) {
             try {
                 // Déterminer l'adresse email de destination
-                $recipientEmail = $emailOption === 'admin' || $emailOption === null 
-                    ? 'admin@example.com' 
+                $recipientEmail = $emailOption === 'admin' || $emailOption === null
+                    ? 'kacemi396@gmail.com'
                     : $emailOption;
                 
                 $fromEmail = $input->getOption('from');

@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil - Administrateur{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+        <h1 class="mb-0">
+            <i class="fas fa-user-circle me-2"></i>
+            Mon profil
+        </h1>
+        <a href="{{ path('app_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour au tableau de bord
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card card-modern shadow-sm">
+                <div class="card-header">
+                    <i class="fas fa-id-card me-2"></i> Informations du compte
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless table-hover">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted" style="width: 220px;">Nom complet</th>
+                                <td>{{ user.fullname }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Email</th>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Rôle</th>
+                                <td>
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-user-shield me-1"></i> {{ user.role ? user.role.value : '—' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Compte actif</th>
+                                <td>
+                                    {% if user.isActive %}
+                                        <span class="text-success"><i class="fas fa-check-circle"></i> Oui</span>
+                                    {% else %}
+                                        <span class="text-danger"><i class="fas fa-times-circle"></i> Non</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Date d'inscription</th>
+                                <td>{{ user.createdAt ? user.createdAt|date('d/m/Y à H:i') : '—' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card card-modern shadow-sm">
+                <div class="card-body text-center py-5">
+                    <div class="user-avatar mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                        {{ user.fullname|slice(0, 1)|upper }}
+                    </div>
+                    <h5 class="mb-1">{{ user.fullname }}</h5>
+                    <p class="text-muted small mb-0">{{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card-modern { border: none; border-radius: 12px; }
+.card-modern .card-header {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-bottom: 2px solid #e9ecef;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+}
+.user-avatar {
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+</style>
+{% endblock %}

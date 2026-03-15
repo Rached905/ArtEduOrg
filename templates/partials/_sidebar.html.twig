@@ -31,12 +31,15 @@
             </div>
 
             <div class="nav-link-group">
-                <a href="{{ path('app_sales_stats') }}" class="nav-link {{ app.request.attributes.get('_route') == 'app_sales_stats' ? 'active' : '' }}" id="sales-link">
+                <a href="{{ path('app_sale_index') }}" class="nav-link {{ app.request.attributes.get('_route') starts with 'app_sale' ? 'active' : '' }}" id="sales-link">
                     <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
                     Ventes
                     <i class="fas fa-chevron-down ms-auto submenu-arrow" id="sales-arrow" onclick="event.stopPropagation(); toggleSubmenu('sales-submenu');" style="cursor: pointer;"></i>
                 </a>
                 <div class="submenu" id="sales-submenu" style="display: none;">
+                    <a href="{{ path('app_sale_new') }}" class="submenu-btn btn-green">
+                        <i class="fas fa-plus"></i> Créer une Vente
+                    </a>
                     <a href="{{ path('app_ticket_new') }}" class="submenu-btn btn-green">
                         <i class="fas fa-ticket-alt"></i> Créer un Ticket
                     </a>

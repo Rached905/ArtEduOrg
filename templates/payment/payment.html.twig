@@ -1,0 +1,429 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement - {{ sale.title }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    #layoutSidenav_content {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0;
+    }
+
+    .payment-container {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 600px;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .payment-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .payment-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        color: #2d3748;
+        margin-bottom: 10px;
+    }
+
+    .payment-header p {
+        color: #718096;
+        font-size: 1rem;
+    }
+
+    .sale-info {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .sale-info h3 {
+        color: #2d3748;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .sale-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e8f0;
+        color: #4a5568;
+    }
+
+    .sale-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .sale-info-item strong {
+        color: #2d3748;
+    }
+
+    .amount-display {
+        text-align: center;
+        margin: 30px 0;
+        padding: 25px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 15px;
+        color: white;
+    }
+
+    .amount-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 10px;
+    }
+
+    .amount-value {
+        font-size: 3rem;
+        font-weight: 700;
+    }
+
+    .payment-form {
+        margin-top: 30px;
+    }
+
+    #payment-element {
+        margin-bottom: 20px;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .submit-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .submit-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .error-message {
+        background: #fee;
+        color: #dc3545;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #dc3545;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #198754;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #198754;
+        text-align: center;
+        display: none;
+    }
+
+    .success-message.show {
+        display: block;
+    }
+
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .stripe-element {
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+    }
+
+    .stripe-element:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .form-group input:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="payment-container">
+    <div class="payment-card">
+        <div class="payment-header">
+            <h1><i class="fas fa-credit-card"></i> Paiement</h1>
+            <p>{{ sale.title }}</p>
+        </div>
+
+        <div class="sale-info">
+            <h3>Résumé de la transaction</h3>
+            <div class="sale-info-item">
+                <span>Vente :</span>
+                <strong>{{ sale.title }}</strong>
+            </div>
+            <div class="sale-info-item">
+                <span>Type :</span>
+                <strong>Achat direct</strong>
+            </div>
+            {% if sale.location %}
+            <div class="sale-info-item">
+                <span>Localisation :</span>
+                <strong>{{ sale.location }}</strong>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="amount-display">
+            <div class="amount-label">Montant à payer</div>
+            <div class="amount-value">{{ amount|number_format(2, ',', ' ') }} €</div>
+        </div>
+
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message">
+            <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <h3>Paiement réussi !</h3>
+            <p>Votre paiement a été traité avec succès.</p>
+            <p style="margin-top: 15px; font-weight: 600; color: #198754;">
+                <i class="fas fa-file-pdf"></i> Votre facture a été téléchargée automatiquement.
+            </p>
+            <p style="margin-top: 10px; color: #4a5568;">
+                <i class="fas fa-envelope"></i> Un email de confirmation avec la facture a été envoyé à votre adresse email.
+            </p>
+            <p style="margin-top: 20px;">
+                <a href="{{ path('app_sale_details', {'id': sale.id}) }}" style="color: #198754; font-weight: 600;">
+                    Retour aux détails
+                </a>
+            </p>
+        </div>
+
+        <form id="payment-form" class="payment-form">
+            <div class="form-group">
+                <label for="client_name">
+                    Nom complet <span style="color: #dc3545;">*</span>
+                </label>
+                <input type="text" id="client_name" name="client_name" required
+                       placeholder="Votre nom complet">
+            </div>
+            <div class="form-group">
+                <label for="client_email">
+                    Email <span style="color: #dc3545;">*</span>
+                </label>
+                <input type="email" id="client_email" name="client_email" required
+                       placeholder="votre@email.com">
+            </div>
+            <div id="payment-element" class="stripe-element">
+                <!-- Stripe Elements va créer les champs ici -->
+            </div>
+            <button type="submit" id="submit-button" class="submit-button">
+                <span id="button-text">
+                    <i class="fas fa-lock"></i> Payer {{ amount|number_format(2, ',', ' ') }} €
+                </span>
+                <span id="button-loading" class="loading" style="display: none;"></span>
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+    
+    let elements;
+    let paymentElement;
+
+    async function initializePayment() {
+        try {
+            const params = new URLSearchParams();
+            params.append('direct_purchase', '1');
+            const clientName = document.getElementById('client_name')?.value || 'Client';
+            const clientEmail = document.getElementById('client_email')?.value || '';
+            params.append('client_name', clientName);
+            params.append('client_email', clientEmail);
+
+            const response = await fetch('{{ path('app_payment_create_intent', {'id': sale.id}) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params
+            });
+
+            const { clientSecret, error } = await response.json();
+
+            if (error) {
+                showError(error);
+                return;
+            }
+
+            elements = stripe.elements({ clientSecret });
+            paymentElement = elements.create('payment', {
+                layout: 'tabs'
+            });
+            paymentElement.mount('#payment-element');
+
+        } catch (error) {
+            showError('Erreur lors de l\'initialisation du paiement : ' + error.message);
+        }
+    }
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const buttonLoading = document.getElementById('button-loading');
+
+        submitButton.disabled = true;
+        buttonText.style.display = 'none';
+        buttonLoading.style.display = 'inline-block';
+
+        const { error, paymentIntent } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: window.location.origin + '{{ path('app_sale_details', {'id': sale.id}) }}',
+            },
+            redirect: 'if_required'
+        });
+
+        if (error) {
+            showError(error.message);
+            submitButton.disabled = false;
+            buttonText.style.display = 'inline';
+            buttonLoading.style.display = 'none';
+        } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+            showSuccess();
+            
+            try {
+                const confirmParams = new URLSearchParams({
+                    'payment_intent_id': paymentIntent.id,
+                });
+                
+                const clientName = document.getElementById('client_name')?.value || '';
+                const clientEmail = document.getElementById('client_email')?.value || '';
+                confirmParams.append('client_name', clientName);
+                confirmParams.append('client_email', clientEmail);
+                
+                const confirmResponse = await fetch('{{ path('app_payment_confirm') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: confirmParams
+                });
+                
+                const confirmData = await confirmResponse.json();
+                
+                if (confirmData.invoice_path) {
+                    const invoiceUrl = '/' + confirmData.invoice_path;
+                    const invoiceLink = document.createElement('a');
+                    invoiceLink.href = invoiceUrl;
+                    invoiceLink.download = 'facture-' + new Date().getTime() + '.pdf';
+                    invoiceLink.style.display = 'none';
+                    document.body.appendChild(invoiceLink);
+                    invoiceLink.click();
+                    setTimeout(() => {
+                        document.body.removeChild(invoiceLink);
+                    }, 100);
+                }
+            } catch (err) {
+                console.error('Erreur confirmation serveur:', err);
+            }
+        }
+    });
+
+    function showError(message) {
+        const errorElement = document.getElementById('error-message');
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+
+    function showSuccess() {
+        document.getElementById('payment-form').style.display = 'none';
+        document.getElementById('success-message').classList.add('show');
+    }
+
+    initializePayment();
+</script>
+{% endblock %}
+

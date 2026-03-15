@@ -26,6 +26,10 @@ class EventReview
     #[ORM\JoinColumn(nullable: false)]
     private ?Event $event = null;
 
+    #[ORM\ManyToOne(targetEntity: Users::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Users $user = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -80,6 +84,18 @@ class EventReview
     public function setEvent(?Event $event): static
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

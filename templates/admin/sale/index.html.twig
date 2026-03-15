@@ -1,0 +1,603 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Ventes - Admin{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* En-tête de page amélioré */
+    .sales-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .sales-header h1 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Cartes statistiques */
+    .stats-card {
+        border-left: 4px solid;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    }
+
+    .stats-card.vente {
+        border-left-color: #0d6efd;
+    }
+
+    .stats-card.ticket {
+        border-left-color: #198754;
+    }
+
+    .stats-card.echange {
+        border-left-color: #ffc107;
+    }
+
+    .stats-card.total {
+        border-left-color: #6c757d;
+    }
+
+    .stats-icon {
+        font-size: 2.5rem;
+        opacity: 0.7;
+    }
+
+    /* Badges de type améliorés */
+    .type-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .type-badge.vente {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .type-badge.ticket {
+        background-color: #198754;
+        color: white;
+    }
+
+    .type-badge.echange {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    /* Badges de statut */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .status-badge.en-attente {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .status-badge.paye {
+        background-color: #198754;
+        color: white;
+    }
+
+    .status-badge.annule {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-indicator.en-attente {
+        background-color: #ffc107;
+        box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+    }
+
+    .status-indicator.paye {
+        background-color: #198754;
+        box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.2);
+    }
+
+    .status-indicator.annule {
+        background-color: #dc3545;
+        box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+    }
+
+    /* Boutons d'action */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .action-buttons form {
+        margin: 0;
+    }
+
+    .action-buttons .btn {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+        transition: all 0.2s;
+    }
+
+    .action-buttons .btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Table améliorée */
+    .table-modern {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    }
+
+    .table-modern thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .table-modern thead th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.2s;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+        box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1);
+    }
+
+    .table-modern tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    /* Filtres et recherche */
+    .filter-section {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box .form-control {
+        padding-left: 2.5rem;
+        border-radius: 2rem;
+        border: 2px solid #dee2e6;
+        transition: all 0.3s;
+    }
+
+    .search-box .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    /* Montant avec style */
+    .amount-display {
+        font-weight: 600;
+        color: #198754;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <!-- Messages flash -->
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <!-- En-tête -->
+    <div class="sales-header mt-4">
+        <div>
+            <h1><i class="fas fa-shopping-cart me-2"></i>Gestion des Ventes</h1>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ path('app_sale_index') }}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li class="breadcrumb-item active">Ventes</li>
+            </ol>
+        </div>
+         <div>
+            <a href="{{ path('app_sale_new') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>Nouvelle Vente
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card vente h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small text-uppercase mb-1">Ventes</div>
+                            <div class="h3 mb-0 font-weight-bold">{{ sales|filter(s => s.type.value == 'vente')|length }}</div>
+                        </div>
+                        <div class="stats-icon text-primary">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card ticket h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small text-uppercase mb-1">Tickets</div>
+                            <div class="h3 mb-0 font-weight-bold">{{ sales|filter(s => s.type.value == 'ticket')|length }}</div>
+                        </div>
+                        <div class="stats-icon text-success">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card echange h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small text-uppercase mb-1">Échanges</div>
+                            <div class="h3 mb-0 font-weight-bold">{{ sales|filter(s => s.type.value == 'echange')|length }}</div>
+                        </div>
+                        <div class="stats-icon text-warning">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card stats-card total h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted small text-uppercase mb-1">Total Ventes</div>
+                            <div class="h3 mb-0 font-weight-bold">{{ sales|length }}</div>
+                        </div>
+                        <div class="stats-icon text-secondary">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="filter-section">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Rechercher par type, statut, montant...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="statusFilter">
+                    <option value="">Tous les statuts</option>
+                    <option value="en-attente">En attente</option>
+                    <option value="paye">Payé</option>
+                    <option value="annule">Annulé</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                    <i class="fas fa-redo me-2"></i>Réinitialiser
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table des ventes -->
+    <div class="card table-modern">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="salesTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-image me-2"></i>Image</th>
+                            <th><i class="fas fa-heading me-2"></i>Titre</th>
+                            <th><i class="fas fa-tag me-2"></i>Type</th>
+                            <th><i class="fas fa-info-circle me-2"></i>Statut</th>
+                            <th><i class="fas fa-money-bill-wave me-2"></i>Montant</th>
+                            <th><i class="fas fa-calendar me-2"></i>Date de création</th>
+                            <th class="text-center"><i class="fas fa-cog me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                            <tr>
+                                <td>
+                                    {% set images = sale.sortedImages %}
+                                    {% set primaryImage = null %}
+                                    {% set secondaryImages = [] %}
+                                    {% for image in images %}
+                                        {% if image.isPrimary %}
+                                            {% set primaryImage = image %}
+                                        {% else %}
+                                            {% set secondaryImages = secondaryImages|merge([image]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                                        {% if primaryImage %}
+                                            <img src="{{ asset(primaryImage.path) }}" alt="{{ sale.title }}" 
+                                                 style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"
+                                                 onclick="showImageModal('{{ asset(primaryImage.path) }}', '{{ sale.title }}')"
+                                                 title="Image principale">
+                                        {% elseif sale.image %}
+                                            <img src="{{ asset(sale.image) }}" alt="{{ sale.title }}" 
+                                                 style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"
+                                                 onclick="showImageModal('{{ asset(sale.image) }}', '{{ sale.title }}')"
+                                                 title="Image principale">
+                                        {% else %}
+                                            <div style="width: 120px; height: 120px; background: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if secondaryImages|length > 0 %}
+                                            <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 140px;">
+                                                {% for image in secondaryImages|slice(0, 4) %}
+                                                    <img src="{{ asset(image.path) }}" alt="{{ sale.title }}" 
+                                                         style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #dee2e6;"
+                                                         onclick="showImageModal('{{ asset(image.path) }}', '{{ sale.title }}')"
+                                                         title="Image secondaire">
+                                                {% endfor %}
+                                                {% if secondaryImages|length > 4 %}
+                                                    <div style="width: 30px; height: 30px; background: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid #dee2e6; font-size: 0.7rem; color: #6c757d; font-weight: 600;">
+                                                        +{{ secondaryImages|length - 4 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>{{ sale.title ?? 'Sans titre' }}</strong>
+                                    {% if sale.description %}
+                                        <br><small class="text-muted">{{ sale.description|slice(0, 50) }}{% if sale.description|length > 50 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if sale.type.value == 'vente' %}
+                                        <span class="type-badge vente">
+                                            <i class="fas fa-shopping-bag me-1"></i>Vente
+                                        </span>
+                                    {% elseif sale.type.value == 'ticket' %}
+                                        <span class="type-badge ticket">
+                                            <i class="fas fa-ticket-alt me-1"></i>Ticket
+                                        </span>
+                                    {% elseif sale.type.value == 'echange' %}
+                                        <span class="type-badge echange">
+                                            <i class="fas fa-exchange-alt me-1"></i>Échange
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if sale.status.value == 'en attente' %}
+                                        <span class="status-badge en-attente">
+                                            <span class="status-indicator en-attente"></span>
+                                            En attente
+                                        </span>
+                                    {% elseif sale.status.value == 'paye' %}
+                                        <span class="status-badge paye">
+                                            <span class="status-indicator paye"></span>
+                                            Payé
+                                        </span>
+                                    {% elseif sale.status.value == 'annule' %}
+                                        <span class="status-badge annule">
+                                            <span class="status-indicator annule"></span>
+                                            Annulé
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="amount-display">
+                                        {{ sale.amount ? sale.amount|number_format(2, ',', ' ') ~ ' €' : 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i>
+                                        {{ sale.createdAt ? sale.createdAt|date('d/m/Y H:i') : 'N/A' }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ path('app_sale_show', {'id': sale.id}) }}" 
+                                           class="btn btn-sm btn-info" 
+                                           title="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_sale_edit', {'id': sale.id}) }}" 
+                                           class="btn btn-sm btn-warning" 
+                                           title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" 
+                                              action="{{ path('app_sale_delete', {'id': sale.id}) }}" 
+                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette vente ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sale.id) }}">
+                                            <button class="btn btn-sm btn-danger" 
+                                                    type="submit" 
+                                                    title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
+                                    <p class="text-muted mb-0">Aucune vente trouvée.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser DataTables
+    const table = document.getElementById('salesTable');
+    if (table && table.querySelector('tbody tr:not(:empty)')) {
+        try {
+            const dataTable = new simpleDatatables.DataTable('#salesTable', {
+                searchable: true,
+                fixedHeight: false,
+                perPage: 10,
+                labels: {
+                    placeholder: "Rechercher...",
+                    perPage: "lignes par page",
+                    noRows: "Aucune vente trouvée",
+                    info: "Affichage de {start} à {end} sur {rows} ventes"
+                },
+                columns: [
+                    { select: 0, sortable: false },
+                    { select: 6, sortable: false }
+                ]
+            });
+        } catch (error) {
+            console.error('Erreur DataTable:', error);
+        }
+    }
+
+    // Recherche personnalisée
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const table = document.getElementById('salesTable');
+            const rows = table.querySelectorAll('tbody tr');
+            const searchTerm = e.target.value.toLowerCase();
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    }
+
+    // Filtre par statut
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function(e) {
+            const table = document.getElementById('salesTable');
+            const rows = table.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                if (e.target.value === '') {
+                    row.style.display = '';
+                } else {
+                    const statusCell = row.querySelector('.status-badge');
+                    if (statusCell) {
+                        const statusText = statusCell.textContent.toLowerCase().trim();
+                        const filterValue = e.target.value.toLowerCase();
+                        
+                        if ((filterValue === 'en-attente' && statusText.includes('attente')) ||
+                            (filterValue === 'paye' && statusText.includes('payé')) ||
+                            (filterValue === 'annule' && statusText.includes('annulé'))) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        });
+    }
+});
+
+// Fonction pour réinitialiser les filtres
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    
+    document.getElementById('searchInput').dispatchEvent(new Event('input'));
+    document.getElementById('statusFilter').dispatchEvent(new Event('change'));
+}
+
+// Fonction pour afficher l'image en modal
+function showImageModal(imageSrc, title) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: pointer;';
+    modal.innerHTML = `
+        <div style="max-width: 90%; max-height: 90%; text-align: center;">
+            <img src="${imageSrc}" alt="${title}" style="max-width: 100%; max-height: 90vh; border-radius: 8px;">
+            <p style="color: white; margin-top: 20px;">${title}</p>
+        </div>
+    `;
+    modal.onclick = () => modal.remove();
+    document.body.appendChild(modal);
+}
+</script>
+{% endblock %}
+

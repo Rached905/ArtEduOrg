@@ -1,8 +1,4 @@
-{% if app.user and app.user.role and (app.user.role.value == 'CLIENT' or app.user.role.value == 'AGENT') %}
-    {% extends 'basec.html.twig' %}
-{% else %}
-    {% extends 'base.html.twig' %}
-{% endif %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Ticket #{{ ticket.id }}{% endblock %}
 

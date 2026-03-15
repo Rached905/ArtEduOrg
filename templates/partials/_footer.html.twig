@@ -1,13 +1,13 @@
-<footer class="py-4 bg-light mt-auto">
+<footer class="footer-modern mt-auto">
     <div class="container-fluid px-4">
         {# Affichage des sponsors de la plateforme #}
         {% set platform_sponsors = get_global_sponsors() %}
         {% if platform_sponsors|length > 0 %}
-            <div class="mb-4">
-                <h6 class="text-muted mb-3 text-center">
+            <div class="sponsors-section mb-4">
+                <h6 class="sponsors-title text-center mb-3">
                     <i class="fas fa-handshake me-2"></i>Nos Sponsors Partenaires
                 </h6>
-                <div class="d-flex flex-wrap justify-content-center align-items-center gap-4">
+                <div class="sponsors-container d-flex flex-wrap justify-content-center align-items-center gap-4">
                     {% for sponsor in platform_sponsors %}
                         <a href="{{ sponsor.website ? sponsor.website : '#' }}" 
                            target="_blank" 
@@ -23,26 +23,55 @@
             </div>
         {% endif %}
         
-        <div class="d-flex align-items-center justify-content-between small">
-            <div class="text-muted">Copyright &copy; ARTEDU {{ "now"|date("Y") }}</div>
-            <div>
-                <a href="#">Politique de confidentialité</a>
-                &middot;
-                <a href="#">Conditions d'utilisation</a>
+        <div class="footer-bottom d-flex align-items-center justify-content-between small">
+            <div class="copyright-text">Copyright &copy; ARTEDU {{ "now"|date("Y") }}</div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Politique de confidentialité</a>
+                <span class="separator">&middot;</span>
+                <a href="#" class="footer-link">Conditions d'utilisation</a>
             </div>
         </div>
     </div>
 </footer>
 
 <style>
+.footer-modern {
+    background: #ffffff;
+    padding: 40px 20px 20px;
+    margin-top: 60px;
+    border-top: 1px solid #e9ecef;
+}
+
+.sponsors-section {
+    padding: 20px 0;
+}
+
+.sponsors-title {
+    color: #6c757d;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+}
+
+.sponsors-title i {
+    color: #e94560;
+}
+
+.sponsors-container {
+    min-height: 80px;
+}
+
 .sponsor-logo-link {
     display: inline-block;
-    padding: 8px;
+    padding: 10px 15px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
     text-decoration: none;
+    border: 1px solid #f0f0f0;
 }
 
 .sponsor-logo {
@@ -51,31 +80,79 @@
     width: auto;
     height: auto;
     object-fit: contain;
-    filter: grayscale(30%);
-    opacity: 0.85;
+    filter: grayscale(20%);
+    opacity: 0.9;
     transition: all 0.3s ease;
     display: block;
 }
 
 .sponsor-logo-link:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #e94560;
 }
 
 .sponsor-logo-link:hover .sponsor-logo {
     filter: grayscale(0%);
     opacity: 1;
-    transform: scale(1.05);
+    transform: scale(1.08);
+}
+
+.footer-bottom {
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    margin-top: 20px;
+}
+
+.copyright-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-link {
+    color: #0d6efd;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: #e94560;
+    text-decoration: underline;
+}
+
+.separator {
+    color: #6c757d;
 }
 
 @media (max-width: 768px) {
+    .footer-modern {
+        padding: 30px 15px 15px;
+    }
+    
     .sponsor-logo {
         max-height: 50px;
         max-width: 120px;
     }
     
     .sponsor-logo-link {
-        padding: 6px;
+        padding: 8px 12px;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .sponsors-container {
+        gap: 15px !important;
     }
 }
 </style>

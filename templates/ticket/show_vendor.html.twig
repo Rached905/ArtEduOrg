@@ -1,0 +1,209 @@
+{% extends 'basev.html.twig' %}
+
+{% block title %}Ticket #{{ ticket.id }} - ArtMarket{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <div class="container">
+        <div class="page-header mt-4 mb-4">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="page-title">
+                        <i class="fas fa-ticket-alt"></i>
+                        Détails du Ticket #{{ ticket.id }}
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ path('app_vendeur') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path('app_event_index') }}">Événements</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Ticket #{{ ticket.id }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <a href="{{ path('app_event_index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux événements
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <h3 class="mb-0">
+                            <i class="fas fa-ticket-alt me-2"></i>
+                            {{ ticket.event ? ticket.event.title : 'Ticket' }}
+                        </h3>
+                        <p class="mb-0 mt-2 small">
+                            {{ ticket.event and ticket.event.startDate ? ticket.event.startDate|date('d/m/Y H:i') : 'Date N/A' }}
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="qr-box text-center p-4" style="background: #f8f9fa; border-radius: 15px; border: 2px solid #e9ecef;">
+                                    <h5 class="mb-3"><i class="fas fa-qrcode"></i> Code QR</h5>
+                                    <div class="qr-container">
+                                        {{ qrSvg|raw }}
+                                    </div>
+                                    <p class="text-muted mt-3 small">Scannez ce code pour le check-in</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="ticket-info">
+                                    <h5 class="mb-3"><i class="fas fa-info-circle"></i> Informations du ticket</h5>
+                                    
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-user"></i> Acheteur
+                                        </div>
+                                        <div class="info-value">
+                                            <strong>{{ ticket.buyerName }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-envelope"></i> Email
+                                        </div>
+                                        <div class="info-value">
+                                            {{ ticket.buyerEmail }}
+                                        </div>
+                                    </div>
+
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-euro-sign"></i> Prix
+                                        </div>
+                                        <div class="info-value">
+                                            <strong>{{ ticket.price ? ticket.price|number_format(2, ',', ' ') ~ ' €' : 'Gratuit' }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-shopping-cart"></i> Quantité
+                                        </div>
+                                        <div class="info-value">
+                                            {{ ticket.quantity }}
+                                        </div>
+                                    </div>
+
+                                    {% if ticket.seatNumber %}
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-chair"></i> Siège
+                                        </div>
+                                        <div class="info-value">
+                                            <span class="badge bg-secondary">#{{ ticket.seatNumber }}</span>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-door-open"></i> Type
+                                        </div>
+                                        <div class="info-value">
+                                            <span class="badge bg-info">Admission générale</span>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-calendar-alt"></i> Date d'achat
+                                        </div>
+                                        <div class="info-value">
+                                            {{ ticket.issuedAt ? ticket.issuedAt|date('d/m/Y à H:i') : 'N/A' }}
+                                        </div>
+                                    </div>
+
+                                    {% if ticket.event %}
+                                    <div class="info-item mb-3">
+                                        <div class="info-label">
+                                            <i class="fas fa-calendar"></i> Événement
+                                        </div>
+                                        <div class="info-value">
+                                            <a href="{{ path('app_event_show', {'id': ticket.event.id}) }}" class="text-decoration-none">
+                                                {{ ticket.event.title }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <a href="{{ qrCodeTargetUrl }}" class="btn btn-primary btn-lg" target="_blank">
+                                <i class="fas fa-check-circle me-2"></i> Scanner le code QR
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color, #1a1a2e);
+    margin-bottom: 10px;
+}
+
+.card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    padding: 20px;
+    border: none;
+}
+
+.qr-container svg {
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin: 0 auto;
+}
+
+.info-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid var(--accent-color, #e94560);
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    color: #2d3748;
+    font-weight: 500;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+

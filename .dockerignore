@@ -1,0 +1,14 @@
+# Don't copy these into the image
+.git
+.env
+.env.*
+!.env.docker
+var
+vendor
+node_modules
+*.md
+.idea
+.vscode
+docker-compose*.yml
+Dockerfile
+.dockerignore

@@ -1,4 +1,4 @@
-{% extends 'basec.html.twig' %}
+{% extends 'basev.html.twig' %}
 
 {% block title %}Dashboard Vendeur - ArtMarket{% endblock %}
 
@@ -30,11 +30,11 @@
                 <i class="fas fa-palette"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">24</h3>
+                <h3 class="stat-value">{{ totalSales }}</h3>
                 <p class="stat-label">Œuvres publiées</p>
             </div>
             <div class="stat-trend up">
-                <i class="fas fa-arrow-up"></i> 12%
+                <i class="fas fa-check"></i>
             </div>
         </div>
 
@@ -43,11 +43,11 @@
                 <i class="fas fa-shopping-cart"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">8</h3>
-                <p class="stat-label">Ventes ce mois</p>
+                <h3 class="stat-value">{{ activeSales }}</h3>
+                <p class="stat-label">Ventes actives</p>
             </div>
             <div class="stat-trend up">
-                <i class="fas fa-arrow-up"></i> 8%
+                <i class="fas fa-check"></i>
             </div>
         </div>
 
@@ -56,11 +56,11 @@
                 <i class="fas fa-euro-sign"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">3,450€</h3>
+                <h3 class="stat-value">{{ monthlyRevenue|number_format(0, ',', ' ') }}€</h3>
                 <p class="stat-label">Revenus du mois</p>
             </div>
             <div class="stat-trend up">
-                <i class="fas fa-arrow-up"></i> 15%
+                <i class="fas fa-arrow-up"></i> {{ monthlyRevenue > 0 ? '15%' : '0%' }}
             </div>
         </div>
 
@@ -69,11 +69,11 @@
                 <i class="fas fa-eye"></i>
             </div>
             <div class="stat-content">
-                <h3 class="stat-value">1,234</h3>
+                <h3 class="stat-value">{{ totalViews|number_format(0, ',', ' ') }}</h3>
                 <p class="stat-label">Vues totales</p>
             </div>
             <div class="stat-trend up">
-                <i class="fas fa-arrow-up"></i> 25%
+                <i class="fas fa-arrow-up"></i> {{ totalViews > 0 ? '25%' : '0%' }}
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@
             <i class="fas fa-bolt"></i> Actions rapides
         </h2>
         <div class="actions-grid">
-            <a href="#" class="action-card">
+            <a href="{{ path('app_sale_new') }}" class="action-card">
                 <div class="action-icon action-icon-1">
                     <i class="fas fa-plus-circle"></i>
                 </div>
@@ -124,64 +124,90 @@
         <div class="content-card">
             <div class="card-header">
                 <h3><i class="fas fa-shopping-bag"></i> Commandes récentes</h3>
-                <a href="#" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
+                <a href="{{ path('app_sale_index') }}" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
             </div>
             <div class="orders-list">
-                <div class="order-item">
-                    <div class="order-artwork">
-                        <div class="artwork-thumb">🎨</div>
-                        <div class="order-info">
-                            <h5>Paysage au crépuscule</h5>
-                            <span class="order-date">Il y a 2 heures</span>
+                {% if recentOrders|length > 0 %}
+                    {% for order in recentOrders %}
+                        {% set orderDate = order.updatedAt ?? order.createdAt %}
+                        {% if orderDate %}
+                            {% set now = 'now'|date('U') %}
+                            {% set orderTimestamp = orderDate|date('U') %}
+                            {% set diff = now - orderTimestamp %}
+                            {% set daysDiff = (diff / 86400)|round(0, 'floor') %}
+                            {% set hoursDiff = (diff / 3600)|round(0, 'floor') %}
+                            
+                            {% if daysDiff == 0 %}
+                                {% if hoursDiff == 0 %}
+                                    {% set dateText = "Il y a moins d'une heure" %}
+                                {% elseif hoursDiff == 1 %}
+                                    {% set dateText = "Il y a 1 heure" %}
+                                {% else %}
+                                    {% set dateText = "Il y a " ~ hoursDiff ~ " heures" %}
+                                {% endif %}
+                            {% elseif daysDiff == 1 %}
+                                {% set dateText = "Hier" %}
+                            {% else %}
+                                {% set dateText = "Il y a " ~ daysDiff ~ " jours" %}
+                            {% endif %}
+                        {% else %}
+                            {% set dateText = "Date inconnue" %}
+                        {% endif %}
+                        
+                        {% set statusValue = order.status.value %}
+                        {% set statusClass = 'status-pending' %}
+                        {% set statusIcon = 'fa-clock' %}
+                        {% set statusText = 'En attente' %}
+                        
+                        {% if statusValue == 'vendue' %}
+                            {% set statusClass = 'status-confirmed' %}
+                            {% set statusIcon = 'fa-check' %}
+                            {% set statusText = 'Vendue' %}
+                        {% elseif statusValue == 'paye' or statusValue == 'payer' %}
+                            {% set statusClass = 'status-delivered' %}
+                            {% set statusIcon = 'fa-check-circle' %}
+                            {% set statusText = 'Payée' %}
+                        {% elseif statusValue == 'payement en cours' %}
+                            {% set statusClass = 'status-shipped' %}
+                            {% set statusIcon = 'fa-shipping-fast' %}
+                            {% set statusText = 'Paiement en cours' %}
+                        {% endif %}
+                        
+                        {% set artworkEmoji = '🎨' %}
+                        {% if order.type %}
+                            {% if order.type.value == 'peinture' %}
+                                {% set artworkEmoji = '🎨' %}
+                            {% elseif order.type.value == 'sculpture' %}
+                                {% set artworkEmoji = '🗿' %}
+                            {% elseif order.type.value == 'photographie' %}
+                                {% set artworkEmoji = '📷' %}
+                            {% elseif order.type.value == 'dessin' %}
+                                {% set artworkEmoji = '✏️' %}
+                            {% else %}
+                                {% set artworkEmoji = '🖼️' %}
+                            {% endif %}
+                        {% endif %}
+                        
+                        <div class="order-item">
+                            <div class="order-artwork">
+                                <div class="artwork-thumb">{{ artworkEmoji }}</div>
+                                <div class="order-info">
+                                    <h5>{{ order.title }}</h5>
+                                    <span class="order-date">{{ dateText }}</span>
+                                </div>
+                            </div>
+                            <div class="order-status {{ statusClass }}">
+                                <i class="fas {{ statusIcon }}"></i> {{ statusText }}
+                            </div>
+                            <div class="order-price">{{ order.amount ? order.amount|number_format(0, ',', ' ') ~ '€' : 'N/A' }}</div>
                         </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                        <p>Aucune commande récente</p>
                     </div>
-                    <div class="order-status status-pending">
-                        <i class="fas fa-clock"></i> En attente
-                    </div>
-                    <div class="order-price">450€</div>
-                </div>
-
-                <div class="order-item">
-                    <div class="order-artwork">
-                        <div class="artwork-thumb">🖼️</div>
-                        <div class="order-info">
-                            <h5>Portrait abstrait</h5>
-                            <span class="order-date">Hier</span>
-                        </div>
-                    </div>
-                    <div class="order-status status-confirmed">
-                        <i class="fas fa-check"></i> Confirmée
-                    </div>
-                    <div class="order-price">680€</div>
-                </div>
-
-                <div class="order-item">
-                    <div class="order-artwork">
-                        <div class="artwork-thumb">🌆</div>
-                        <div class="order-info">
-                            <h5>Ville nocturne</h5>
-                            <span class="order-date">Il y a 3 jours</span>
-                        </div>
-                    </div>
-                    <div class="order-status status-shipped">
-                        <i class="fas fa-shipping-fast"></i> Expédiée
-                    </div>
-                    <div class="order-price">520€</div>
-                </div>
-
-                <div class="order-item">
-                    <div class="order-artwork">
-                        <div class="artwork-thumb">🎭</div>
-                        <div class="order-info">
-                            <h5>Composition moderne</h5>
-                            <span class="order-date">Il y a 5 jours</span>
-                        </div>
-                    </div>
-                    <div class="order-status status-delivered">
-                        <i class="fas fa-check-circle"></i> Livrée
-                    </div>
-                    <div class="order-price">890€</div>
-                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -205,67 +231,61 @@
     <div class="popular-section">
         <div class="card-header">
             <h3><i class="fas fa-fire"></i> Vos œuvres populaires</h3>
-            <a href="#" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="{{ path('app_sale_new') }}" class="btn-add-artwork" style="background: var(--accent-color); color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-plus"></i> Ajouter une œuvre
+                </a>
+                <a href="{{ path('app_sale_index') }}" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
+            </div>
         </div>
         <div class="artworks-grid">
-            <div class="artwork-card">
-                <div class="artwork-image">
-                    <div class="artwork-placeholder">🎨</div>
-                    <div class="artwork-badge">Top ventes</div>
-                </div>
-                <div class="artwork-info">
-                    <h4>Aurore boréale</h4>
-                    <div class="artwork-stats">
-                        <span><i class="fas fa-eye"></i> 245</span>
-                        <span><i class="fas fa-heart"></i> 89</span>
+            {% if sales|length > 0 %}
+                {% for sale in sales %}
+                    <div class="artwork-card">
+                        <div class="artwork-image">
+                            {% set primaryImage = sale.getPrimaryImage() %}
+                            {% if primaryImage %}
+                                <img src="{{ asset(primaryImage.path) }}" alt="{{ sale.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% elseif sale.image %}
+                                <img src="{{ asset(sale.image) }}" alt="{{ sale.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                <div class="artwork-placeholder">🎨</div>
+                            {% endif %}
+                            {% if sale.status.value == 'vendue' %}
+                                <div class="artwork-badge" style="background: #4caf50;">Vendue</div>
+                            {% elseif sale.status.value == 'en attente' %}
+                                <div class="artwork-badge" style="background: #ff9800;">En attente</div>
+                            {% else %}
+                                <div class="artwork-badge">Disponible</div>
+                            {% endif %}
+                        </div>
+                        <div class="artwork-info">
+                            <h4>{{ sale.title }}</h4>
+                            <div class="artwork-stats">
+                                <span><i class="fas fa-calendar"></i> {{ sale.createdAt|date('d/m/Y') }}</span>
+                                <span><i class="fas fa-tag"></i> {{ sale.type.value }}</span>
+                            </div>
+                            <div class="artwork-price">{% if sale.amount %}{{ sale.amount }}€{% else %}Prix sur demande{% endif %}</div>
+                            <div class="artwork-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                                <a href="{{ path('app_sale_details', {id: sale.id}) }}" class="btn-action btn-view" style="flex: 1; padding: 8px; background: #f0f0f0; border-radius: 8px; text-align: center; text-decoration: none; color: var(--dark-color); font-size: 0.9rem;">
+                                    <i class="fas fa-eye"></i> Consulter
+                                </a>
+                                <a href="{{ path('app_sale_edit', {id: sale.id}) }}" class="btn-action btn-edit" style="flex: 1; padding: 8px; background: #2196f3; border-radius: 8px; text-align: center; text-decoration: none; color: white; font-size: 0.9rem;">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="artwork-price">750€</div>
+                {% endfor %}
+            {% else %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #999;">
+                    <i class="fas fa-palette" style="font-size: 3rem; margin-bottom: 20px; display: block;"></i>
+                    <p style="font-size: 1.2rem; margin-bottom: 20px;">Aucune œuvre publiée pour le moment</p>
+                    <a href="{{ path('app_sale_new') }}" class="btn-add-artwork" style="background: var(--accent-color); color: white; padding: 12px 30px; border-radius: 10px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-plus"></i> Ajouter votre première œuvre
+                    </a>
                 </div>
-            </div>
-
-            <div class="artwork-card">
-                <div class="artwork-image">
-                    <div class="artwork-placeholder">🖼️</div>
-                    <div class="artwork-badge">Tendance</div>
-                </div>
-                <div class="artwork-info">
-                    <h4>Rêverie urbaine</h4>
-                    <div class="artwork-stats">
-                        <span><i class="fas fa-eye"></i> 198</span>
-                        <span><i class="fas fa-heart"></i> 67</span>
-                    </div>
-                    <div class="artwork-price">620€</div>
-                </div>
-            </div>
-
-            <div class="artwork-card">
-                <div class="artwork-image">
-                    <div class="artwork-placeholder">🌅</div>
-                    <div class="artwork-badge">Nouveau</div>
-                </div>
-                <div class="artwork-info">
-                    <h4>Horizon doré</h4>
-                    <div class="artwork-stats">
-                        <span><i class="fas fa-eye"></i> 156</span>
-                        <span><i class="fas fa-heart"></i> 45</span>
-                    </div>
-                    <div class="artwork-price">580€</div>
-                </div>
-            </div>
-
-            <div class="artwork-card">
-                <div class="artwork-image">
-                    <div class="artwork-placeholder">🎭</div>
-                </div>
-                <div class="artwork-info">
-                    <h4>Masques vénitiens</h4>
-                    <div class="artwork-stats">
-                        <span><i class="fas fa-eye"></i> 134</span>
-                        <span><i class="fas fa-heart"></i> 38</span>
-                    </div>
-                    <div class="artwork-price">480€</div>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -812,13 +832,32 @@ document.getElementById('currentDate').textContent = new Date().toLocaleDateStri
 // Sales Chart
 const ctx = document.getElementById('salesChart');
 if (ctx) {
+    // Préparer les données dynamiques
+    const salesData = {{ salesByDay|json_encode|raw }};
+    
+    // Générer les 7 derniers jours avec leurs noms
+    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    const labels = [];
+    const data = [];
+    
+    // Créer un tableau pour les 7 derniers jours
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateKey = date.toISOString().split('T')[0];
+        const dayName = days[date.getDay()];
+        
+        labels.push(dayName);
+        data.push(salesData[dateKey] || 0);
+    }
+    
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+            labels: labels,
             datasets: [{
                 label: 'Ventes (€)',
-                data: [450, 680, 320, 890, 520, 750, 620],
+                data: data,
                 borderColor: '#e94560',
                 backgroundColor: 'rgba(233, 69, 96, 0.1)',
                 borderWidth: 3,
@@ -837,6 +876,13 @@ if (ctx) {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Ventes: ' + context.parsed.y.toFixed(2) + ' €';
+                        }
+                    }
                 }
             },
             scales: {
@@ -844,6 +890,11 @@ if (ctx) {
                     beginAtZero: true,
                     grid: {
                         color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toFixed(0) + ' €';
+                        }
                     }
                 },
                 x: {

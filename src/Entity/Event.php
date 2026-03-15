@@ -124,7 +124,7 @@ class Event
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTimeInterface $startDate): static
+    public function setStartDate(?\DateTimeInterface $startDate): static
     {
         $this->startDate = $startDate;
 

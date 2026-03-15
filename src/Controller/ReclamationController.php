@@ -82,7 +82,7 @@ class ReclamationController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Réclamation créée avec succès !');
-            return $this->redirectToRoute('reclamation_new');
+            return $this->redirectToRoute('reclamation_index_user');
         }
 
         return $this->render('reclamation/new.html.twig', [

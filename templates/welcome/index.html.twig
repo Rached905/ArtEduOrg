@@ -5,6 +5,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #e94560 0%, #d63850 100%);
@@ -409,6 +410,367 @@
             opacity: 0.9;
         }
         
+        /* Showcase Sections */
+        .showcase-section {
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease 0.7s both;
+        }
+
+        .btn-view-all {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-view-all:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+            color: white;
+        }
+
+        /* Œuvres Grid */
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .showcase-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+
+        .showcase-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(233, 69, 96, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .showcase-image {
+            position: relative;
+            height: 250px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8ecf1 100%);
+            overflow: hidden;
+        }
+
+        .showcase-image .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .showcase-card:hover .card-img {
+            transform: scale(1.1);
+        }
+
+        .card-img-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #ccc;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-badge.available {
+            background: #28a745;
+        }
+
+        .status-badge.sold {
+            background: #6c757d;
+        }
+
+        .showcase-content {
+            padding: 1.5rem;
+        }
+
+        .showcase-content h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .showcase-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            min-height: 48px;
+        }
+
+        .showcase-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .showcase-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .showcase-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .btn-view-details {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view-details:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+            color: white;
+        }
+
+        /* Artistes Grid */
+        .artists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .artist-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+
+        .artist-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(233, 69, 96, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .artist-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+        }
+
+        .artist-info h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .artist-email {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .artist-stats {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .stat-badge {
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--accent-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Événements Grid */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(233, 69, 96, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .event-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .event-header h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            flex: 1;
+        }
+
+        .event-type-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .event-body {
+            padding: 1.5rem;
+        }
+
+        .event-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            min-height: 48px;
+        }
+
+        .event-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .event-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .event-detail-item i {
+            color: var(--accent-color);
+            width: 20px;
+        }
+
+        .event-footer {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn-event-details {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-event-details:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+            color: white;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero-section {
@@ -442,6 +804,23 @@
 
             .cta-section h2 {
                 font-size: 2rem;
+            }
+
+            .showcase-grid,
+            .artists-grid,
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-view-all {
+                width: 100%;
+                justify-content: center;
+                margin-top: 1rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start !important;
             }
         }
     </style>
@@ -529,6 +908,261 @@
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
+    
+    {# Section Nos Œuvres #}
+    <div class="showcase-section">
+        <div class="section-header">
+            <div class="section-badge">GALERIE</div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h2 class="section-title">Nos Œuvres</h2>
+                <a href="{{ path('app_login') }}" class="btn-view-all">
+                    Voir tout <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="showcase-grid">
+            {% if sales|length > 0 %}
+                {% for sale in sales %}
+                    <div class="showcase-card">
+                        <div class="showcase-image">
+                            {% set primaryImage = sale.getPrimaryImage() %}
+                            {% if primaryImage %}
+                                <img src="{{ asset(primaryImage.path) }}" alt="{{ sale.title }}" class="card-img">
+                            {% elseif sale.image %}
+                                <img src="{{ asset(sale.image) }}" alt="{{ sale.title }}" class="card-img">
+                            {% else %}
+                                <div class="card-img-placeholder">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% endif %}
+                            {% if sale.status.value == 'disponible' or sale.status.value == 'en attente' %}
+                                <span class="status-badge available">Disponible</span>
+                            {% elseif sale.status.value == 'vendue' %}
+                                <span class="status-badge sold">Vendue</span>
+                            {% endif %}
+                        </div>
+                        <div class="showcase-content">
+                            <h4>{{ sale.title }}</h4>
+                            <p class="showcase-description">{{ sale.description|length > 80 ? sale.description|slice(0, 80) ~ '...' : sale.description }}</p>
+                            <div class="showcase-meta">
+                                <span class="meta-item">
+                                    <i class="bi bi-tag"></i> {{ sale.type.value|capitalize }}
+                                </span>
+                                {% if sale.vendeur %}
+                                    <span class="meta-item">
+                                        <i class="bi bi-person"></i> {{ sale.vendeur.fullname }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div class="showcase-footer">
+                                <span class="showcase-price">
+                                    {% if sale.amount %}
+                                        {{ sale.amount|number_format(0, ',', ' ') }} €
+                                    {% else %}
+                                        Prix sur demande
+                                    {% endif %}
+                                </span>
+                                <a href="{{ path('app_login') }}" class="btn-view-details">
+                                    Voir détails <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-palette"></i>
+                    <p>Aucune œuvre disponible pour le moment</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Section Nos Artistes #}
+    <div class="showcase-section">
+        <div class="section-header">
+            <div class="section-badge">ARTISTES</div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h2 class="section-title">Nos Artistes</h2>
+                <a href="{{ path('app_login') }}" class="btn-view-all">
+                    Voir tout <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="artists-grid">
+            {% if artists|length > 0 %}
+                {% for artist in artists %}
+                    <div class="artist-card">
+                        <div class="artist-avatar">
+                            {% if artist.isVirtual is defined and artist.isVirtual %}
+                                {% if artist.fullname %}
+                                    {{ artist.fullname|first|upper }}
+                                {% else %}
+                                    <i class="bi bi-person"></i>
+                                {% endif %}
+                            {% else %}
+                                {% if artist.fullname %}
+                                    {{ artist.fullname|first|upper }}
+                                {% else %}
+                                    <i class="bi bi-person"></i>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="artist-info">
+                            <h4>{{ artist.fullname ?? 'Artiste' }}</h4>
+                            <p class="artist-email">{{ artist.email ?? 'N/A' }}</p>
+                            <div class="artist-stats">
+                                <span class="stat-badge">
+                                    <i class="bi bi-palette"></i> Artiste
+                                </span>
+                                {% if artist.isVirtual is defined and artist.isVirtual %}
+                                    <span class="stat-badge" style="background: rgba(108, 117, 125, 0.1); color: #6c757d; margin-left: 0.5rem;">
+                                        <i class="bi bi-star"></i> Légendaire
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <p>Aucun artiste disponible pour le moment</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Section Nos Événements #}
+    <div class="showcase-section">
+        <div class="section-header">
+            <div class="section-badge">ÉVÉNEMENTS</div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h2 class="section-title">Nos Événements</h2>
+                <a href="{{ path('app_login') }}" class="btn-view-all">
+                    Voir tout <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="events-grid">
+            {% if events|length > 0 %}
+                {% for event in events %}
+                    <div class="event-card">
+                        <div class="event-header">
+                            <h4>
+                                {% if event.isVirtual is defined and event.isVirtual %}
+                                    {{ event.title }}
+                                    <span class="event-type-badge" style="background: rgba(255, 255, 255, 0.3); font-size: 0.7rem; margin-left: 0.5rem;">
+                                        <i class="bi bi-star"></i> Virtuel
+                                    </span>
+                                {% else %}
+                                    {{ event.title }}
+                                {% endif %}
+                            </h4>
+                            {% if event.type %}
+                                <span class="event-type-badge">
+                                    {% if event.isVirtual is defined and event.isVirtual %}
+                                        {{ event.type }}
+                                    {% else %}
+                                        {{ event.type }}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="event-body">
+                            {% if event.description %}
+                                <p class="event-description">{{ event.description|length > 100 ? event.description|slice(0, 100) ~ '...' : event.description }}</p>
+                            {% elseif event.getDescription is defined %}
+                                <p class="event-description">{{ event.getDescription()|length > 100 ? event.getDescription()|slice(0, 100) ~ '...' : event.getDescription() }}</p>
+                            {% endif %}
+                            <div class="event-details">
+                                {% if event.isVirtual is defined and event.isVirtual %}
+                                    {# Événement virtuel #}
+                                    {% if event.startDate %}
+                                        <div class="event-detail-item">
+                                            <i class="bi bi-calendar-event"></i>
+                                            <span>{{ event.startDate|date('d/m/Y H:i') }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if event.location %}
+                                        <div class="event-detail-item">
+                                            <i class="bi bi-geo-alt"></i>
+                                            <span>{{ event.location }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if event.price is defined %}
+                                        {% set virtualPrice = event.price|replace({',': '.'})|number_format(2, '.', '') %}
+                                        {% if virtualPrice > 0 %}
+                                            <div class="event-detail-item">
+                                                <i class="bi bi-currency-euro"></i>
+                                                <span>{{ event.price }} €</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="event-detail-item">
+                                                <i class="bi bi-gift"></i>
+                                                <span>Gratuit</span>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="event-detail-item">
+                                            <i class="bi bi-gift"></i>
+                                            <span>Gratuit</span>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    {# Événement réel de la base de données #}
+                                    {% if event.getStartDate() %}
+                                        <div class="event-detail-item">
+                                            <i class="bi bi-calendar-event"></i>
+                                            <span>{{ event.getStartDate()|date('d/m/Y H:i') }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if event.getLocation() %}
+                                        <div class="event-detail-item">
+                                            <i class="bi bi-geo-alt"></i>
+                                            <span>{{ event.getLocation() }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if event.getPrice() %}
+                                        {% set eventPrice = event.getPrice()|replace({',': '.'})|number_format(2, '.', '') %}
+                                        {% if eventPrice > 0 %}
+                                            <div class="event-detail-item">
+                                                <i class="bi bi-currency-euro"></i>
+                                                <span>{{ event.getPrice() }} €</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="event-detail-item">
+                                                <i class="bi bi-gift"></i>
+                                                <span>Gratuit</span>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="event-detail-item">
+                                            <i class="bi bi-gift"></i>
+                                            <span>Gratuit</span>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <a href="{{ path('app_login') }}" class="btn-event-details">
+                                Voir détails <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-calendar-event"></i>
+                    <p>Aucun événement disponible pour le moment</p>
+                </div>
+            {% endif %}
         </div>
     </div>
     

@@ -49,6 +49,12 @@
 .leaflet-container {
     font-family: inherit;
 }
+
+/* Mise en évidence des champs contenant des bad words */
+.badword-highlight {
+    background-color: #fff3cd !important; /* Jaune clair type alerte */
+    border-color: #ffecb5 !important;
+}
 </style>
 {% endblock %}
 
@@ -61,6 +67,52 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    /**
+     * Modération simple des bad words sur les champs texte de l'événement.
+     * Quand un mot interdit (ex: "fuck") est détecté dans le champ (mot entier),
+     * le champ devient jaune et un message d'avertissement apparaît sous le champ.
+     */
+    function setupBadWordModeration() {
+        const badWords = ['fuck', 'shit', 'merde', 'pute'];
+
+        const fields = [
+            { input: document.getElementById('event_title'), label: 'Titre' },
+            { input: document.getElementById('event_description'), label: 'Description' },
+        ].filter(f => f.input);
+
+        if (!fields.length) {
+            return;
+        }
+
+        const regex = new RegExp('\\b(' + badWords.join('|') + ')\\b', 'i');
+
+        fields.forEach(({ input, label }) => {
+            // Créer / attacher un message d'avertissement sous le champ
+            let warningEl = input.parentElement.querySelector('.badword-warning');
+            if (!warningEl) {
+                warningEl = document.createElement('small');
+                warningEl.className = 'form-text text-warning badword-warning';
+                warningEl.style.display = 'none';
+                warningEl.textContent = `Attention : des mots inappropriés ont été détectés dans le champ ${label}.`;
+                input.parentElement.appendChild(warningEl);
+            }
+
+            const checkValue = () => {
+                const value = input.value || '';
+                if (regex.test(value.toLowerCase())) {
+                    input.classList.add('badword-highlight');
+                    warningEl.style.display = 'block';
+                } else {
+                    input.classList.remove('badword-highlight');
+                    warningEl.style.display = 'none';
+                }
+            };
+
+            input.addEventListener('input', checkValue);
+            input.addEventListener('blur', checkValue);
+        });
+    }
+
     // Coordonnées par défaut (Tunis, Tunisie)
     let defaultLat = 36.8065;
     let defaultLng = 10.1815;
@@ -189,6 +241,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         });
     }
+
+    // Activer la modération des bad words sur les champs texte
+    setupBadWordModeration();
 });
 </script>
 {% endblock %}

@@ -1,0 +1,56 @@
+# Use this when you only have the app image from Docker Hub (no source code).
+# Replace YOUR_DOCKERHUB_USER with the real username, e.g. arteduorg/arteduorg-app
+#
+# Usage:
+#   1. Create a folder and save this file as docker-compose.yml
+#   2. Create .env with: ARTEDUORG_IMAGE=YOUR_DOCKERHUB_USER/arteduorg-app:latest
+#   3. Run: docker-compose up -d
+#   4. Open http://localhost:8080
+
+version: "3.8"
+
+services:
+  app:
+    image: ${ARTEDUORG_IMAGE:-arteduorg/arteduorg-app:latest}
+    container_name: arteduorg-app
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET:-change-me-in-production}
+      DATABASE_URL: mysql://arteduorg:arteduorg_secret@mysql:3306/arteduorg?serverVersion=8.0&charset=utf8mb4
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+      MAILER_FROM: ${MAILER_FROM:-ArtEduOrg <noreply@example.com>}
+      STRIPE_PUBLIC_KEY: ${STRIPE_PUBLIC_KEY:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - var_data:/var/www/html/var
+      - uploads_data:/var/www/html/public/uploads
+      - invoices_data:/var/www/html/public/invoices
+
+  mysql:
+    image: mysql:8.0
+    container_name: arteduorg-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_secret
+      MYSQL_DATABASE: arteduorg
+      MYSQL_USER: arteduorg
+      MYSQL_PASSWORD: arteduorg_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_secret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:
+  var_data:
+  uploads_data:
+  invoices_data:
