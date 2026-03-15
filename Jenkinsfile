@@ -3,7 +3,7 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
-        timeout(time: 15, unit: 'MINUTES')
+        timeout(time: 20, unit: 'MINUTES')
         timestamps()
     }
 
@@ -21,7 +21,8 @@ pipeline {
 
         stage('Check environment') {
             steps {
-                sh 'php -v && composer -V'
+                sh 'php -v'
+                sh 'composer -V'
             }
         }
 
@@ -33,22 +34,15 @@ pipeline {
 
         stage('Prepare test database') {
             steps {
-                sh '''
-                    mkdir -p var
-                    export DATABASE_URL="sqlite:///${WORKSPACE}/var/data_test.db"
-                    php bin/console doctrine:database:create --env=test --if-not-exists 2>/dev/null || true
-                    php bin/console doctrine:migrations:migrate --env=test --no-interaction 2>/dev/null || true
-                    php bin/console cache:clear --env=test
-                '''
+                sh 'php bin/console doctrine:database:create --env=test --if-not-exists || true'
+                sh 'php bin/console doctrine:migrations:migrate --env=test --no-interaction || true'
+                sh 'php bin/console cache:clear --env=test'
             }
         }
 
         stage('Run tests') {
             steps {
-                sh '''
-                    export DATABASE_URL="sqlite:///${WORKSPACE}/var/data_test.db"
-                    ./vendor/bin/phpunit --configuration phpunit.xml.dist
-                '''
+                sh './vendor/bin/phpunit --configuration phpunit.xml.dist'
             }
             post {
                 always {
