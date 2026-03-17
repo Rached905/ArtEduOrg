@@ -5,7 +5,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql)
 
-A platform for buying and selling artworks online. Built with **Symfony 6**, **PHP 8.2**, and **MySQL**.
+ArtEduOrg is an online marketplace connecting artists and art lovers — built with Symfony 6 and PHP 8.2.
 
 ---
 
@@ -19,7 +19,12 @@ A platform for buying and selling artworks online. Built with **Symfony 6**, **P
 
 ## 2. Platform features
 
-The platform has three types of users:
+The platform has three types of users — Admin, Artist (Seller), and Buyer.
+
+🎨 Artists can upload and manage artworks
+🛒 Buyers can browse, filter, and purchase
+👑 Admin dashboard with full statistics
+💳 Stripe payment integration
 
 - **Admin**  
   Manages users (artists and buyers), artwork listings, orders, and payments. Has access to a full dashboard with statistics.
@@ -47,6 +52,7 @@ The platform has three types of users:
 4. Open **http://localhost:8000** in your browser.
 
 ---
+## Note: The Docker Hub image is not yet published. This section will be updated once the image is available.
 
 ## 4. How to run with Docker (recommended — no technical setup)
 
@@ -136,8 +142,3 @@ volumes:
   uploads_data:
   invoices_data:
 ```
-
----
-
-## 6. Screenshots (main flows)
-
